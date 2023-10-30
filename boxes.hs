@@ -1,0 +1,20 @@
+--LETS GET THIS SHIT 
+--list of letters for the horizontal axis, list of numbers for vertical axis (numbers start at top, then go down, top left is A1)
+-- point is a tuple of (letter location, number location)
+--an edge is a (point, direction)
+--Direction= Right or Down 
+--Player = P1 | P2
+--Turn is type alias for player. 
+--Box type? : (Player, Point) --assume top right point 
+--Board = [edges]
+ -- score = [boxes]
+ --game is won once the length of score = (board length-1)^2
+ --Box math : (x, y) (x+1, y)   idk what this is check picture 
+            -- (x, y+1) (x+1, y+1) 
+
+    --priorities for sprint 1:
+    --get data types done (Noah) 
+    --make test inputs (Daisy)
+    --make a move function(Neil) 
+    --pretty show function (hard, multi-person task, get Fogarty help)
+    --check winner function (Melissa) 
