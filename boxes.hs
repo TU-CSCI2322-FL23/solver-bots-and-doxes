@@ -54,6 +54,23 @@ findScore :: [Box] -> Score
 findScore boxes = (length p1, length p2)
                 where (p1, p2) =partition (\(_, player) -> player == P1) boxes --splits into p1's/p2's boxes 
 
+allPoints :: [Point]
+allPoints = [makePoint a one, makePoint a two, makePoint a three , makePoint a four, makePoint a five,
+             makePoint b one, makePoint b two, makePoint b three , makePoint b four, makePoint b five,
+             makePoint c one, makePoint c two, makePoint c three , makePoint c four, makePoint c five,
+             makePoint d one, makePoint d two, makePoint d three , makePoint d four, makePoint d five,
+             makePoint e one, makePoint e two, makePoint e three , makePoint e four, makePoint e five]
+           where a = toX 'A'
+                 b = toX 'B'
+                 c = toX 'C'
+                 d = toX 'D'
+                 e = toX 'E'
+                 one = toY 1
+                 two=toY 2
+                 three = toY 3
+                 four = toY 4
+                 five = toY 5
+
  
 -- point is a tuple of (letter location, number location)
 --an edge is a (point, direction)
