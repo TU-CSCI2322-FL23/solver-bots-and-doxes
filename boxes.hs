@@ -1,5 +1,5 @@
 import Data.List 
---LETS GET THIS SHIT 
+--LETS GET THIS SHIT DONE
 --list of letters for the horizontal axis, list of numbers for vertical axis (numbers start at top, then go down, top left is A1)
 data X_axis = A | B | C | D | E deriving (Show, Eq) --hard coded for 5x5 grid for now       --added (Eq)
 data Y_axis = One | Two | Three | Four | Five deriving (Show, Eq) --Note: can't use numbers as direct constructor (override show for nums? ex.5) --added (Eq)
@@ -104,6 +104,29 @@ updateBoard :: Board -> Edge -> Player -> Maybe Board -- maybe it should be put 
 updateBoard board edge player
     | isValid board edge = Just (edge : board)
     | otherwise = Nothing
+
+--BUILD BOARD
+
+buildBoard :: [Edge]
+buildBoard = concatMap (\point -> [makeEdge point Right1, makeEdge point Down]) allPoints
+
+-- Build a row of edges starting at a given point
+buildRow :: Point -> [Edge]
+buildRow startPoint = [makeEdge startPoint Right1 | x <- [startPoint..(E, y)]]
+  where (_, y) = startPoint
+
+-- Build a column of edges starting at a given point
+buildColumn :: Point -> [Edge]
+buildColumn startPoint = [makeEdge startPoint Down | y <- [startPoint..(x, Five)]]
+  where (x, _) = startPoint
+-- Build a list of all available moves (edges) on the game board
+buildAvailables :: Board -> [Edge]
+buildAvailables board = filter (\edge -> isAvailable board edge) allEdges
+  where
+    allEdges = [(point, direction) | point <- allPoints, direction <- [Right1, Down]]
+
+
+
 
 -- point is a tuple of (letter location, number location)
 --an edge is a (point, direction)
