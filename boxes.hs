@@ -111,19 +111,20 @@ buildBoard :: [Edge]
 buildBoard = concatMap (\point -> [makeEdge point Right1, makeEdge point Down]) allPoints
 
 -- Build a row of edges starting at a given point
-buildRow :: Point -> [Edge]
-buildRow startPoint = [makeEdge startPoint Right1 | x <- [startPoint..(E, y)]]
-  where (_, y) = startPoint
+--buildRow :: Point -> [Edge]
+--buildRow startPoint = [makeEdge startPoint Right1 | x <- [startPoint..(E, y)]]
+--  where (_, y) = startPoint
 
 -- Build a column of edges starting at a given point
-buildColumn :: Point -> [Edge]
-buildColumn startPoint = [makeEdge startPoint Down | y <- [startPoint..(x, Five)]]
-  where (x, _) = startPoint
+--buildColumn :: Point -> [Edge]
+--buildColumn startPoint = [makeEdge startPoint Down | y <- [startPoint..(x, Five)]]
+--  where (x, _) = startPoint
+
 -- Build a list of all available moves (edges) on the game board
-buildAvailables :: Board -> [Edge]
-buildAvailables board = filter (\edge -> isAvailable board edge) allEdges
-  where
-    allEdges = [(point, direction) | point <- allPoints, direction <- [Right1, Down]]
+--buildAvailables :: Board -> [Edge]
+--buildAvailables board = filter (\edge -> isAvailable board edge) allEdges
+--  where
+--    allEdges = [(point, direction) | point <- allPoints, direction <- [Right1, Down]]
 
 
 
