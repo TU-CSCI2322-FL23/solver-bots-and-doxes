@@ -1,11 +1,11 @@
 import Data.List 
 --LETS GET THIS SHIT 
 --list of letters for the horizontal axis, list of numbers for vertical axis (numbers start at top, then go down, top left is A1)
-data X_axis = A | B | C | D | E deriving Show --hard coded for 5x5 grid for now 
-data Y_axis = One | Two | Three | Four | Five deriving Show --Note: can't use numbers as direct constructor (override show for nums? ex.5) 
+data X_axis = A | B | C | D | E deriving (Show, Eq) --hard coded for 5x5 grid for now       --added (Eq)
+data Y_axis = One | Two | Three | Four | Five deriving (Show, Eq) --Note: can't use numbers as direct constructor (override show for nums? ex.5) --added (Eq)
 --was getting mad for something like Y_axis = 1|2|3|4|5
 type Point = (X_axis, Y_axis) --making x_axis/y_axis points lets us control size of grid through constructors for each type
-data Direction = Right1 | Down  deriving Show --Right1 cuz Right conflicts w/ special word 
+data Direction = Right1 | Down  deriving (Show, Eq) --Right1 cuz Right conflicts w/ special word        --added (Eq)
 data Player = P1 | P2 deriving (Show, Eq)
 type Edge =(Point, Direction)
 type Box= (Point, Player) 
@@ -72,6 +72,39 @@ allPoints = [makePoint a one, makePoint a two, makePoint a three , makePoint a f
                  five = toY 5
 
  
+--MOVEMENT
+moveHorizontal :: Point -> Maybe Edge
+moveHorizontal point@(x, y)
+    | x == E = Nothing  -- Rightmost node, can't move right there should be an error msg from above
+    | otherwise = Just (makeEdge point Right1) --right1 cause thats what it was above
+
+moveVertical :: Point -> Maybe Edge
+moveVertical point@(x, y)
+    | y == Five = Nothing  -- Bottom node, can't move down there should be an error msg from above
+    | otherwise = Just (makeEdge point Down) 
+
+--Board Checks
+
+isAvailable :: Board -> Point -> Direction -> Bool
+isAvailable board point direction = notElem (makeEdge point direction) board
+
+isHorizontal :: Edge -> Bool
+isHorizontal (_, direction) = direction == Right1 --right1 cause thats what it was above
+
+isVertical :: Edge -> Bool
+isVertical (_, direction) = direction == Down
+
+isValid :: Board -> Edge -> Bool
+isValid board edge@(point, direction) =
+    isWithinBounds point && isAvailable board point direction
+    where
+        isWithinBounds (x, y) = x /= E && y /= Five
+
+updateBoard :: Board -> Edge -> Player -> Maybe Board -- maybe it should be put edge in board and if that edge meakes a square set a boolean to true?
+updateBoard board edge player
+    | isValid board edge = Just (edge : board)
+    | otherwise = Nothing
+
 -- point is a tuple of (letter location, number location)
 --an edge is a (point, direction)
 
