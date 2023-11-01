@@ -105,6 +105,15 @@ findWinner (board, boxes) = if p1_score > p2_score then Just P1 else if p1_score
     where   scored = findScore boxes
             p1_score = fst scored
             p2_score = snd scored
+
+--type Point = (Int, Int) --making x_axis/y_axis points lets us control size of grid through constructors for each type
+--type Edge =(Point, Direction)
+pointToBox :: Point -> [Edge] -> Player -> Maybe Box 
+pointToBox (x, y) edge_list player = if (e1 `elem` edge_list) && (e2 `elem` edge_list) && (e3 `elem` edge_list) && (e4 `elem` edge_list) then Just $ makeBox (makePoint x y) player else Nothing
+    where e1 = makeEdge (makePoint x y) (makeDirection "right")
+          e2 = makeEdge (makePoint x y) (makeDirection "down")
+          e3 = makeEdge (makePoint (x+1) y) (makeDirection "down")
+          e4 = makeEdge (makePoint x (y+1)) (makeDirection "right")
 -- Build a row of edges starting at a given point
 --buildRow :: Point -> [Edge]
 --buildRow startPoint = [makeEdge startPoint Right1 | x <- [startPoint..(E, y)]]
