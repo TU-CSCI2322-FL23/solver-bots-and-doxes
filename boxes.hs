@@ -10,13 +10,7 @@ data Player = P1 | P2 deriving (Show, Eq)
 type Edge =(Point, Direction)
 type Box= (Point, Player) 
 type Board = [Edge]
-type Boxes = [Box] --Need to keep track of boxes because player that closes box matters
 type Score = (Int, Int) --CHANGED FROM [BOXES] TO (player1_score, player2_score), findScore function below 
-type Game = (Board, Boxes)
-
---prettyPrint :: Game -> String
---prettyPrint ([],_) = blankLine
---    where blankLine = ".   .   .   .   .\n.   .   .   .   .\n.   .   .   .   .\n.   .   .   .   .\n.   .   .   .   .\n"
 
 toX :: Char -> X_axis --might need to add more if we extend the board at any point 
 toX 'A' = A
@@ -56,7 +50,7 @@ makeBox point player = (point, player)
 makeBoard :: [Edge] -> Board
 makeBoard edges = edges 
 
-findScore :: Boxes -> Score --still takes [Box], called Boxes for consistency with gamestate tracking
+findScore :: [Box] -> Score 
 findScore boxes = (length p1, length p2)
                 where (p1, p2) =partition (\(_, player) -> player == P1) boxes --splits into p1's/p2's boxes 
 
@@ -131,6 +125,33 @@ buildBoard = concatMap (\point -> [makeEdge point Right1, makeEdge point Down]) 
 --buildAvailables board = filter (\edge -> isAvailable board edge) allEdges
 --  where
 --    allEdges = [(point, direction) | point <- allPoints, direction <- [Right1, Down]]
+
+
+
+
+
+boardToString :: Board -> String
+boardToString b = x ++ "\n" ++ fst (foldl printBoxes ("",(0,0)) b)
+  where x = fst $ foldl printHorizontal ("*",(0,0)) $ head b
+
+printBoxes :: (String,Point) -> [Box] -> (String,Point)
+printBoxes (s,(p1,p2)) lb = (s++x++"\n"++y++"\n",(p1+1,p2))
+  where z = if ((p1,p2),(p1+1,p2)) `elem` fst (head lb) then "-" else " "
+        x = fst $ foldl printVertical (z,(p1,p2)) lb
+        y = fst $ foldl printHorizontal ("*",(p1+1,p2)) lb
+
+printHorizontal :: (String,Point) -> Box -> (String,Point)
+printHorizontal (s,(p1,p2)) (le,_) = if ((p1,p2),(p1,p2+1)) `elem` le then (s++" - *",(p1,p2+1)) else (s++"   *",(p1,p2+1))
+
+printVertical :: (String,Point) -> Box -> (String,Point)
+printVertical (s,(p1,p2)) (le,n) = if ((p1,p2+1),(p1+1,p2+1)) `elem` le then (s++" "++show n++" -",(p1,p2+1)) else (s++" "++show n++"  ",(p1,p2+1))
+
+printBoard :: Board -> IO ()
+printBoard b = do putStrLn ""
+                  putStrLn $ boardToString b
+                  putStrLn ""
+
+
 
 
 
