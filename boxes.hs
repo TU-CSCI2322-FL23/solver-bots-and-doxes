@@ -11,6 +11,10 @@ type Edge =(Point, Direction)
 type Box= (Point, Player) 
 type Board = [Edge]
 type Score = (Int, Int) --CHANGED FROM [BOXES] TO (player1_score, player2_score), findScore function below 
+type Boxes = [Box] --Need to keep track of boxes because player that closes box matters
+type Game = (Board, Boxes)
+
+
 
 toX :: Char -> X_axis --might need to add more if we extend the board at any point 
 toX 'A' = A
@@ -50,7 +54,7 @@ makeBox point player = (point, player)
 makeBoard :: [Edge] -> Board
 makeBoard edges = edges 
 
-findScore :: [Box] -> Score 
+findScore :: Boxes -> Score --still takes [Box], called Boxes for consistency with gamestate tracking
 findScore boxes = (length p1, length p2)
                 where (p1, p2) =partition (\(_, player) -> player == P1) boxes --splits into p1's/p2's boxes 
 
