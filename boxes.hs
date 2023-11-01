@@ -1,11 +1,9 @@
 import Data.List 
 --LETS GET THIS SHIT DONE
 --list of letters for the horizontal axis, list of numbers for vertical axis (numbers start at top, then go down, top left is A1)
-data X_axis = A | B | C | D | E deriving (Show, Eq) --hard coded for 5x5 grid for now       --added (Eq)
-data Y_axis = One | Two | Three | Four | Five deriving (Show, Eq) --Note: can't use numbers as direct constructor (override show for nums? ex.5) --added (Eq)
 --was getting mad for something like Y_axis = 1|2|3|4|5
-type Point = (X_axis, Y_axis) --making x_axis/y_axis points lets us control size of grid through constructors for each type
-data Direction = Right | Down  deriving (Show, Eq) --Right1 cuz Right conflicts w/ special word        --added (Eq)
+type Point = (Int, Int) --making x_axis/y_axis points lets us control size of grid through constructors for each type
+data Direction = Right1 | Down1  deriving (Show, Eq) --Right1 cuz Right conflicts w/ special word        --added (Eq)
 data Player = P1 | P2 deriving (Show, Eq)
 type Edge =(Point, Direction)
 type Box= (Point, Player) 
@@ -16,36 +14,20 @@ type Game = (Board, Boxes)
 --boooooopooppboppoa hfdlhg kjg
 --pretty pretty print
 
-toX :: Char -> X_axis --might need to add more if we extend the board at any point 
-toX 'A' = A
-toX 'B' = B
-toX 'C' = C
-toX 'D' = D
-toX 'E' = E
-toX _ = error "invalid X-axis coordinate"
-
-toY :: Int-> Y_axis
-toY 1 = One
-toY 2 = Two
-toY 3 = Three
-toY 4 = Four
-toY 5 = Five 
-toY _ = error "invalid Y-axis coordinate"
-
-makePoint:: X_axis -> Y_axis -> Point
+makePoint:: Int -> Int -> Point
 makePoint x y = (x, y)
 
 makeDirection :: String -> Direction
 makeDirection "Right" = Right1 --conflicts with prelude def Right, so it's Right1. Could do left instead if weird naming scheme is an issue 
-makeDirection "Down" = Down
+makeDirection "Down" = Down1
 makeDirection _ = error "invalid direction, only right or down permitted"
 
 makePlayer :: String -> Player
 makePlayer "P1" = P1
 makePlayer "P2" = P2
 makeEdge :: Point -> Direction -> Edge --should cover cases for out of bounds moves (for 5x5 grid)
-makeEdge (E, _) Right1 = error "can't go right on rightmost node"
-makeEdge (_, Five) Down = error "can't go down on bottom node"
+makeEdge (5, _) Right1 = error "can't go right on rightmost node"
+makeEdge (_, 5) Down1 = error "can't go down on bottom node"
 makeEdge p d = (p, d) 
 
 makeBox :: Point -> Player -> Box 
@@ -64,28 +46,28 @@ allPoints = [makePoint a one, makePoint a two, makePoint a three , makePoint a f
              makePoint c one, makePoint c two, makePoint c three , makePoint c four, makePoint c five,
              makePoint d one, makePoint d two, makePoint d three , makePoint d four, makePoint d five,
              makePoint e one, makePoint e two, makePoint e three , makePoint e four, makePoint e five]
-           where a = toX 'A'
-                 b = toX 'B'
-                 c = toX 'C'
-                 d = toX 'D'
-                 e = toX 'E'
-                 one = toY 1
-                 two=toY 2
-                 three = toY 3
-                 four = toY 4
-                 five = toY 5
+           where a = 1
+                 b = 2
+                 c = 3
+                 d = 4
+                 e = 5
+                 one = 1
+                 two=2
+                 three = 3
+                 four = 4
+                 five = 5
 
  
 --MOVEMENT
 moveHorizontal :: Point -> Maybe Edge
 moveHorizontal point@(x, y)
-    | x == E = Nothing  -- Rightmost node, can't move right there should be an error msg from above
+    | x == 5 = Nothing  -- Rightmost node, can't move right there should be an error msg from above
     | otherwise = Just (makeEdge point Right1) --right1 cause thats what it was above
 
 moveVertical :: Point -> Maybe Edge
 moveVertical point@(x, y)
-    | y == Five = Nothing  -- Bottom node, can't move down there should be an error msg from above
-    | otherwise = Just (makeEdge point Down) 
+    | y == 5 = Nothing  -- Bottom node, can't move down there should be an error msg from above
+    | otherwise = Just (makeEdge point Down1) 
 
 --Board Checks
 
@@ -96,13 +78,13 @@ isHorizontal :: Edge -> Bool
 isHorizontal (_, direction) = direction == Right1 --right1 cause thats what it was above
 
 isVertical :: Edge -> Bool
-isVertical (_, direction) = direction == Down
+isVertical (_, direction) = direction == Down1
 
 isValid :: Board -> Edge -> Bool
 isValid board edge@(point, direction) =
     isWithinBounds point && isAvailable board point direction
     where
-        isWithinBounds (x, y) = x /= E && y /= Five
+        isWithinBounds (x, y) = x /= 5 && y /= 5
 
 updateBoard :: Board -> Edge -> Player -> Maybe Board -- maybe it should be put edge in board and if that edge meakes a square set a boolean to true?
 updateBoard board edge player
@@ -112,7 +94,7 @@ updateBoard board edge player
 --BUILD BOARD
 
 buildBoard :: [Edge]
-buildBoard = concatMap (\point -> [makeEdge point Right1, makeEdge point Down]) allPoints
+buildBoard = concatMap (\point -> [makeEdge point Right1, makeEdge point Down1]) allPoints
 
 -- Build a row of edges starting at a given point
 --buildRow :: Point -> [Edge]
