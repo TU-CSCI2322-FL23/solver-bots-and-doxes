@@ -14,7 +14,7 @@ type Score = (Int, Int) --CHANGED FROM [BOXES] TO (player1_score, player2_score)
 type Boxes = [Box] --Need to keep track of boxes because player that closes box matters
 type Game = (Board, Boxes)
 
-
+--boooooopooppboppoa hfdlhg kjg
 
 toX :: Char -> X_axis --might need to add more if we extend the board at any point 
 toX 'A' = A
