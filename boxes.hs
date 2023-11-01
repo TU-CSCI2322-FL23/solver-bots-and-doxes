@@ -134,26 +134,26 @@ buildBoard = concatMap (\point -> [makeEdge point Right1, makeEdge point Down]) 
 
 
 
-boardToString :: Board -> String
-boardToString b = x ++ "\n" ++ fst (foldl printBoxes ("",(0,0)) b)
-  where x = fst $ foldl printHorizontal ("*",(0,0)) $ head b
+-- boardToString :: Board -> String
+-- boardToString b = x ++ "\n" ++ fst (foldl printBoxes ("",(0,0)) b)
+--   where x = fst $ foldl printHorizontal ("*",(0,0)) $ head b
 
-printBoxes :: (String,Point) -> [Box] -> (String,Point)
-printBoxes (s,(p1,p2)) lb = (s++x++"\n"++y++"\n",(p1+1,p2))
-  where z = if ((p1,p2),(p1+1,p2)) `elem` fst (head lb) then "-" else " "
-        x = fst $ foldl printVertical (z,(p1,p2)) lb
-        y = fst $ foldl printHorizontal ("*",(p1+1,p2)) lb
+-- printBoxes :: (String,Point) -> [Box] -> (String,Point)
+-- printBoxes (s,(p1,p2)) lb = (s++x++"\n"++y++"\n",(p1+1,p2))
+--   where z = if ((p1,p2),(p1+1,p2)) `elem` fst (head lb) then "-" else " "
+--         x = fst $ foldl printVertical (z,(p1,p2)) lb
+--         y = fst $ foldl printHorizontal ("*",(p1+1,p2)) lb
 
-printHorizontal :: (String,Point) -> Box -> (String,Point)
-printHorizontal (s,(p1,p2)) (le,_) = if ((p1,p2),(p1,p2+1)) `elem` le then (s++" - *",(p1,p2+1)) else (s++"   *",(p1,p2+1))
+-- printHorizontal :: (String,Point) -> Box -> (String,Point)
+-- printHorizontal (s,(p1,p2)) (tlpoint, player) = if ((p1,p2),(p1,p2+1)) `elem` le then (s++" - *",(p1,p2+1)) else (s++"   *",(p1,p2+1))
 
-printVertical :: (String,Point) -> Box -> (String,Point)
-printVertical (s,(p1,p2)) (le,n) = if ((p1,p2+1),(p1+1,p2+1)) `elem` le then (s++" "++show n++" -",(p1,p2+1)) else (s++" "++show n++"  ",(p1,p2+1))
+-- printVertical :: (String,Point) -> Box -> (String,Point)
+-- printVertical (s,(p1,p2)) (le,n) = if ((p1,p2+1),(p1+1,p2+1)) `elem` le then (s++" "++show n++" -",(p1,p2+1)) else (s++" "++show n++"  ",(p1,p2+1))
 
-printBoard :: Board -> IO ()
-printBoard b = do putStrLn ""
-                  putStrLn $ boardToString b
-                  putStrLn ""
+-- printBoard :: Board -> IO ()
+-- printBoard b = do putStrLn ""
+--                   putStrLn $ boardToString b
+--                   putStrLn ""
 
 
 
