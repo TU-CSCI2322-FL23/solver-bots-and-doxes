@@ -1,1 +1,1 @@
-# game-solver-template
+Bots and Doxes - YAY
