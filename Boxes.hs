@@ -19,9 +19,9 @@ makePoint:: Int -> Int -> Point
 makePoint x y = (x, y)
 
 makeDirection :: String -> Direction
-makeDirection "Right" = Right1 --conflicts with prelude def Right, so it's Right1. Could do left instead if weird naming scheme is an issue 
+makeDirection "Right" = Right1 --conflicts with prelude def Right, so it's Right1. 
 makeDirection "Down" = Down1
-makeDirection _ = error "invalid direction, only right or down permitted"
+makeDirection _ = error "invalid direction, only Right or Down permitted"
 
 makePlayer :: String -> Player
 makePlayer "P1" = P1
@@ -108,12 +108,14 @@ findWinner (board, boxes) = if p1_score > p2_score then Just P1 else if p1_score
 
 --type Point = (Int, Int) --making x_axis/y_axis points lets us control size of grid through constructors for each type
 --type Edge =(Point, Direction)
+
+
 pointToBox :: Point -> [Edge] -> Player -> Maybe Box 
-pointToBox (x, y) edge_list player = if (e1 `elem` edge_list) && (e2 `elem` edge_list) && (e3 `elem` edge_list) && (e4 `elem` edge_list) then Just $ makeBox (makePoint x y) player else Nothing
-    where e1 = makeEdge (makePoint x y) (makeDirection "right")
-          e2 = makeEdge (makePoint x y) (makeDirection "down")
-          e3 = makeEdge (makePoint (x+1) y) (makeDirection "down")
-          e4 = makeEdge (makePoint x (y+1)) (makeDirection "right")
+pointToBox (x, y) edge_list player = if ((e1 `elem` edge_list) && (e2 `elem` edge_list) && (e3 `elem` edge_list) && (e4 `elem` edge_list)) then Just $ makeBox (makePoint x y) player else Nothing
+    where e1 = makeEdge (makePoint x y) (makeDirection "Right")
+          e2 = makeEdge (makePoint x y) (makeDirection "Down")
+          e3 = makeEdge (makePoint (x+1) y) (makeDirection "Down")
+          e4 = makeEdge (makePoint x (y+1)) (makeDirection "Right")
 -- Build a row of edges starting at a given point
 --buildRow :: Point -> [Edge]
 --buildRow startPoint = [makeEdge startPoint Right1 | x <- [startPoint..(E, y)]]
