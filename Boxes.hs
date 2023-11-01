@@ -1,3 +1,4 @@
+module Boxes where
 import Data.List 
 --LETS GET THIS SHIT DONE
 --list of letters for the horizontal axis, list of numbers for vertical axis (numbers start at top, then go down, top left is A1)
@@ -96,6 +97,14 @@ updateBoard board edge player
 buildBoard :: [Edge]
 buildBoard = concatMap (\point -> [makeEdge point Right1, makeEdge point Down1]) allPoints
 
+--WINNER LOGIC
+
+--assuming game inputed is a finished game
+findWinner :: Game -> Maybe Player
+findWinner (board, boxes) = if p1_score > p2_score then Just P1 else if p1_score < p2_score then Just P2 else Nothing
+    where   scored = findScore boxes
+            p1_score = fst scored
+            p2_score = snd scored
 -- Build a row of edges starting at a given point
 --buildRow :: Point -> [Edge]
 --buildRow startPoint = [makeEdge startPoint Right1 | x <- [startPoint..(E, y)]]
