@@ -1,3 +1,3 @@
-Bots and Doxes - YAY
+Bots and Doxes 
 Audrey
 Noah
