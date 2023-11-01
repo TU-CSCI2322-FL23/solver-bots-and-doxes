@@ -13,7 +13,7 @@ type Board = [Edge]
 type Score = (Int, Int) --CHANGED FROM [BOXES] TO (player1_score, player2_score), findScore function below 
 type Boxes = [Box] --Need to keep track of boxes because player that closes box matters
 type Game = (Board, Boxes)
-data Winner = Undefined
+--boooooopooppboppoa hfdlhg kjg
 
 toX :: Char -> X_axis --might need to add more if we extend the board at any point 
 toX 'A' = A
