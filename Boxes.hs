@@ -58,6 +58,21 @@ allPoints = [makePoint a one, makePoint a two, makePoint a three , makePoint a f
                  four = 4
                  five = 5
 
+allBoxPoints :: [Point]
+allBoxPoints = [makePoint a one, makePoint a two, makePoint a three , makePoint a four,
+             makePoint b one, makePoint b two, makePoint b three , makePoint b four,
+             makePoint c one, makePoint c two, makePoint c three , makePoint c four, 
+             makePoint d one, makePoint d two, makePoint d three , makePoint d four]
+           
+           where a = 1
+                 b = 2
+                 c = 3
+                 d = 4
+                 one = 1
+                 two=2
+                 three = 3
+                 four = 4
+              
  
 --MOVEMENT
 moveHorizontal :: Point -> Maybe Edge
@@ -109,6 +124,11 @@ findWinner (board, boxes) = if p1_score > p2_score then Just P1 else if p1_score
 --type Point = (Int, Int) --making x_axis/y_axis points lets us control size of grid through constructors for each type
 --type Edge =(Point, Direction)
 
+--not working, logic is decent, but if one edge ends up not making box only returns nothing 
+--will also probably reassign all boxes to whichever player gets passed in
+--will need another helper function to deal with it
+pointstoBoxes :: [Point] -> [Edge] -> Player -> [Maybe Box]
+pointstoBoxes points edges player = [pointToBox p edges player|p<-allBoxPoints]
 
 pointToBox :: Point -> [Edge] -> Player -> Maybe Box 
 pointToBox (x, y) edge_list player = if ((e1 `elem` edge_list) && (e2 `elem` edge_list) && (e3 `elem` edge_list) && (e4 `elem` edge_list)) then Just $ makeBox (makePoint x y) player else Nothing
