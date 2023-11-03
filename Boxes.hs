@@ -11,7 +11,9 @@ type Box= (Point, Player)
 type Board = [Edge]
 type Score = (Int, Int) --CHANGED FROM [BOXES] TO (player1_score, player2_score), findScore function below 
 type Boxes = [Box] --Need to keep track of boxes because player that closes box matters
-type Game = (Board, Boxes, Player)
+type Game = (Board, Boxes, Player, Int)
+--DONT LET THEM MAKE A GAME OF SIZE 1 IT WILL NEVER END
+--data Game = Game { board :: Board, boxes :: Boxes, turn :: Player, x :: Int, y :: Int }
 --boooooopooppboppoa hfdlhg kjg
 --pretty pretty print
 opponent:: Player -> Player
@@ -68,6 +70,7 @@ allPoints = [makePoint a one, makePoint a two, makePoint a three , makePoint a f
 moveHorizontal :: Point -> Maybe Edge
 moveHorizontal point@(x, y)
     | x == 5 = Nothing  -- Rightmost node, can't move right there should be an error msg from above
+    | otherwise = Just (makeEdge point Right1) --right1 cause thats what it was abovelist of moves
     | otherwise = Just (makeEdge point Right1) --right1 cause thats what it was above
 
 moveVertical :: Point -> Maybe Edge
@@ -120,6 +123,17 @@ buildBoard = concatMap (\point -> [makeEdge point Right1, makeEdge point Down1])
 
 --assuming game inputed is a finished game
 findWinner :: Game -> Maybe Player
+findWinner (board, boxes, _, _) = if p1_score > p2_score then Just P1 else if p1_score < p2_score then Just P2 else Nothing
+    where   scored = findScore boxes
+            p1_score = fst scored
+            p2_score = snd scored
+
+
+-- prettyShow :: Game -> String
+-- prettyShow ([],_,_)=".   .   .   .   .\n\n"
+
+-- prettyPrint :: Game -> IO ()
+-- prettyPrint
 findWinner (board, boxes, _) = if p1_score > p2_score then Just P1 else if p1_score < p2_score then Just P2 else Nothing
     where   scored = findScore boxes
             p1_score = fst scored
