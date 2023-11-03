@@ -168,8 +168,8 @@ checkBox :: Point -> [Edge] -> Bool
 checkBox (x, y) edge_list = if ((e1 `elem` edge_list) && (e2 `elem` edge_list) && (e3 `elem` edge_list) && (e4 `elem` edge_list)) then True else False 
     where e1 = makeEdge (makePoint x y) (makeDirection "Right")
           e2 = makeEdge (makePoint x y) (makeDirection "Down")
-         e3 = makeEdge (makePoint (x+1) y) (makeDirection "Down")
-         e4 = makeEdge (makePoint x (y+1)) (makeDirection "Right")
+          e3 = makeEdge (makePoint (x+1) y) (makeDirection "Down")
+          e4 = makeEdge (makePoint x (y+1)) (makeDirection "Right")
 --Build a row of edges starting at a given point
 
 
@@ -179,10 +179,6 @@ checkBox (x, y) edge_list = if ((e1 `elem` edge_list) && (e2 `elem` edge_list) &
 
 -- prettyPrint :: Game -> IO ()
 -- prettyPrint
-findWinner (board, boxes, _) = if p1_score > p2_score then Just P1 else if p1_score < p2_score then Just P2 else Nothing
-    where   scored = findScore boxes
-            p1_score = fst scored
-            p2_score = snd scored
 
 
 -- Build a row of edges starting at a given point
