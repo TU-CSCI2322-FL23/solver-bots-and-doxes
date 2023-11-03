@@ -15,6 +15,8 @@ type Game = (Board, Boxes)
 --boooooopooppboppoa hfdlhg kjg
 --pretty pretty print
 
+amIDumb :: Point -> Point -> Point --ok 75% of the constructors weren't needed 
+amIDumb p1 p2 = ((fst p1 + fst p2) ,(snd p1 + snd p2))
 makePoint:: Int -> Int -> Point
 makePoint x y = (x, y)
 
@@ -127,6 +129,8 @@ findWinner (board, boxes) = if p1_score > p2_score then Just P1 else if p1_score
 --not working, logic is decent, but if one edge ends up not making box only returns nothing 
 --will also probably reassign all boxes to whichever player gets passed in
 --will need another helper function to deal with it
+
+
 pointstoBoxes :: [Point] -> [Edge] -> Player -> [Maybe Box]
 pointstoBoxes points edges player = [pointToBox p edges player|p<-allBoxPoints]
 
