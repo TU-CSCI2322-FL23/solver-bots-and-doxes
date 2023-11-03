@@ -23,6 +23,7 @@ opponent P2 = P1
 
 amIDumb :: Point -> Point -> Point --ok 75% of the constructors weren't needed 
 amIDumb p1 p2 = ((fst p1 + fst p2) ,(snd p1 + snd p2))
+
 makePoint:: Int -> Int -> Point
 makePoint x y = (x, y)
 
@@ -37,8 +38,6 @@ makePlayer "P1" = P1
 makePlayer "P2" = P2
 
 makeEdge :: Point -> Direction -> Edge --should cover cases for out of bounds moves (for 5x5 grid)
-makeEdge (5, _) Right1 = error "can't go right on rightmost node"
-makeEdge (_, 5) Down1 = error "can't go down on bottom node"
 makeEdge p d = (p, d) 
 
 makeBox :: Point -> Player -> Box 
@@ -50,39 +49,7 @@ makeBoard edges = edges
 findScore :: Boxes -> Score --still takes [Box], called Boxes for consistency with gamestate tracking
 findScore boxes = (length p1, length p2)
                 where (p1, p2) =partition (\(_, player) -> player == P1) boxes --splits into p1's/p2's boxes 
-
-allPoints :: [Point]
-allPoints = [makePoint a one, makePoint a two, makePoint a three , makePoint a four, makePoint a five,
-             makePoint b one, makePoint b two, makePoint b three , makePoint b four, makePoint b five,
-             makePoint c one, makePoint c two, makePoint c three , makePoint c four, makePoint c five,
-             makePoint d one, makePoint d two, makePoint d three , makePoint d four, makePoint d five,
-             makePoint e one, makePoint e two, makePoint e three , makePoint e four, makePoint e five]
-           where a = 1
-                 b = 2
-                 c = 3
-                 d = 4
-                 e = 5
-                 one = 1
-                 two=2
-                 three = 3
-                 four = 4
-                 five = 5
-
-allBoxPoints :: [Point]
-allBoxPoints = [makePoint a one, makePoint a two, makePoint a three , makePoint a four,
-             makePoint b one, makePoint b two, makePoint b three , makePoint b four,
-             makePoint c one, makePoint c two, makePoint c three , makePoint c four, 
-             makePoint d one, makePoint d two, makePoint d three , makePoint d four]
-           
-           where a = 1
-                 b = 2
-                 c = 3
-                 d = 4
-                 one = 1
-                 two=2
-                 three = 3
-                 four = 4
-              
+ 
  
 --MOVEMENT
 {-
@@ -135,8 +102,9 @@ updateBoard board edge player
 
 --BUILD BOARD
 
-buildBoard :: [Edge]
-buildBoard = concatMap (\point -> [makeEdge point Right1, makeEdge point Down1]) allPoints
+--no longer necessary and also wrong
+--buildBoard :: [Edge]
+--buildBoard = concatMap (\point -> [makeEdge point Right1, makeEdge point Down1]) allPoints
 
 --WINNER LOGIC
 
@@ -159,7 +127,7 @@ findWinner (board, boxes, _, _) = if p1_score > p2_score then Just P1 else if p1
 --might go outside the board
 --will take in move board and 
 makeBoxes :: Edge -> Game -> [Box]
-makeBoxes = undefined 
+makeBoxes move@(point@(x, y), direc) game@(board, boxes, player, _) = if(checkBox point board) then if((y-1 > 0) && checkBox (x,y-1) board) then [(point, player), ((x,y-1), player)] else [(point, player)] else []
 
 
 
