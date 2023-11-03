@@ -127,7 +127,12 @@ findWinner (board, boxes, _, _) = if p1_score > p2_score then Just P1 else if p1
 --might go outside the board
 --will take in move board and 
 makeBoxes :: Edge -> Game -> [Box]
-makeBoxes move@(point@(x, y), direc) game@(board, boxes, player, _) = if(checkBox point board) then if((y-1 > 0) && checkBox (x,y-1) board) then [(point, player), ((x,y-1), player)] else [(point, player)] else []
+makeBoxes move@(point@(x, y), direc) game@(board, boxes, player, _) = 
+            if(checkBox point board) then 
+                if((y-1 > 0) && checkBox (x,y-1) board) 
+                    then  [(point, player), ((x,y-1), player)] 
+                else [(point, player)] 
+            else []
 
 
 
