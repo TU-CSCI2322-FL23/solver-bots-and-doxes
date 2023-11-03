@@ -29,6 +29,7 @@ makeDirection _ = error "invalid direction, only right or down permitted"
 makePlayer :: String -> Player
 makePlayer "P1" = P1
 makePlayer "P2" = P2
+
 makeEdge :: Point -> Direction -> Edge --should cover cases for out of bounds moves (for 5x5 grid)
 makeEdge (5, _) Right1 = error "can't go right on rightmost node"
 makeEdge (_, 5) Down1 = error "can't go down on bottom node"
@@ -63,6 +64,7 @@ allPoints = [makePoint a one, makePoint a two, makePoint a three , makePoint a f
 
  
 --MOVEMENT
+{-
 moveHorizontal :: Point -> Maybe Edge
 moveHorizontal point@(x, y)
     | x == 5 = Nothing  -- Rightmost node, can't move right there should be an error msg from above
@@ -72,9 +74,20 @@ moveVertical :: Point -> Maybe Edge
 moveVertical point@(x, y)
     | y == 5 = Nothing  -- Bottom node, can't move down there should be an error msg from above
     | otherwise = Just (makeEdge point Down1) 
+-}
+makeMove :: Board -> Edge -> Player -> Maybe Board
+makeMove board edge player
+    | validMove edge board = Just (edge : board) --checks if move is valid if so the just edge on board -- type Board = [Edge]
+    | otherwise = Nothing
 
 validMove :: Edge -> Board -> Bool
 validMove edge board = notElem edge board
+
+-- What moves are legal for a game state (Game -> [Move] ). in this case Board is game and edge is move
+legalMoves :: Board -> [Edge]
+legalMoves board = filter (\edge -> validMove edge board) allPossibleEdges --aPE will have to change is we change the size of board
+    where
+        allPossibleEdges = [makeEdge (x, y) dir | x <- [1..4], y <- [1..4], dir <- [Right1, Down1]] --hardcoded for 1..4 board
 
 --Board Checks
 
