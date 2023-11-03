@@ -11,13 +11,9 @@ type Box= (Point, Player)
 type Board = [Edge]
 type Score = (Int, Int) --CHANGED FROM [BOXES] TO (player1_score, player2_score), findScore function below 
 type Boxes = [Box] --Need to keep track of boxes because player that closes box matters
-<<<<<<< HEAD
 type Game = (Board, Boxes, Player, Int)
 --DONT LET THEM MAKE A GAME OF SIZE 1 IT WILL NEVER END
 --data Game = Game { board :: Board, boxes :: Boxes, turn :: Player, x :: Int, y :: Int }
-=======
-type Game = (Board, Boxes, Player)
->>>>>>> c5ab5b2d9cc4ffc2ca9a43aca28679ceb6479d35
 --boooooopooppboppoa hfdlhg kjg
 --pretty pretty print
 opponent:: Player -> Player
@@ -40,11 +36,6 @@ makeEdge :: Point -> Direction -> Edge --should cover cases for out of bounds mo
 makeEdge (5, _) Right1 = error "can't go right on rightmost node"
 makeEdge (_, 5) Down1 = error "can't go down on bottom node"
 makeEdge p d = (p, d) 
-
-validMoves :: Game -> [Edge]
-validMoves (board, _, _, int) = (list of moves) \\ board
-    where lstPts = [1..(int-1)]
--- \\ is set minus
 
 makeBox :: Point -> Player -> Box 
 makeBox point player = (point, player)
