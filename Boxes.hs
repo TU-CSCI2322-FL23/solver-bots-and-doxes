@@ -125,6 +125,7 @@ findWinner (board, boxes, _, _) = if p1_score > p2_score then Just P1 else if p1
     where   scored = findScore boxes
             p1_score = fst scored
             p2_score = snd scored
+    
 
 --type Point = (Int, Int) --making x_axis/y_axis points lets us control size of grid through constructors for each type
 --type Edge =(Point, Direction)
@@ -133,19 +134,21 @@ findWinner (board, boxes, _, _) = if p1_score > p2_score then Just P1 else if p1
 --will also probably reassign all boxes to whichever player gets passed in
 --will need another helper function to deal with it
 
-wasBoxMade :: Edge -> [Edge] -> Bool
-wasBoxMade ((x, y),Right1) edge_list = (checkBoxAtPoint (x, y) edge_list) && (checkBoxAtPoint ( x, y+1) edge_list) 
-wasBoxMade ((x, y),Down1) edge_list = (checkBoxAtPoint (x, y) edge_list) && (checkBoxAtPoint (x-1, y) edge_list) 
+--might go outside the board
+--will take in move board and 
+makeBoxes :: Edge -> Game -> [Box]
+makeBoxes = undefined 
 
 
 
-checkBoxAtPoint :: Point -> [Edge] -> Bool 
-checkBoxAtPoint (x, y) edge_list = if ((e1 `elem` edge_list) && (e2 `elem` edge_list) && (e3 `elem` edge_list) && (e4 `elem` edge_list)) then True else False 
+
+checkBox :: Point -> [Edge] -> Bool 
+checkBox (x, y) edge_list = if ((e1 `elem` edge_list) && (e2 `elem` edge_list) && (e3 `elem` edge_list) && (e4 `elem` edge_list)) then True else False 
     where e1 = makeEdge (makePoint x y) (makeDirection "Right")
           e2 = makeEdge (makePoint x y) (makeDirection "Down")
-          e3 = makeEdge (makePoint (x+1) y) (makeDirection "Down")
-          e4 = makeEdge (makePoint x (y+1)) (makeDirection "Right")
--- Build a row of edges starting at a given point
+         e3 = makeEdge (makePoint (x+1) y) (makeDirection "Down")
+         e4 = makeEdge (makePoint x (y+1)) (makeDirection "Right")
+--Build a row of edges starting at a given point
 --buildRow :: Point -> [Edge]
 --buildRow startPoint = [makeEdge startPoint Right1 | x <- [startPoint..(E, y)]]
 --  where (_, y) = startPoint
