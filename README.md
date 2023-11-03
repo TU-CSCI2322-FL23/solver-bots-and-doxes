@@ -1,1 +1,5 @@
-# game-solver-template
+Bots and Doxes 
+Audrey
+Noah
+Daisy
+Neil

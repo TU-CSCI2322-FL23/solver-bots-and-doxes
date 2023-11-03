@@ -11,9 +11,13 @@ type Box= (Point, Player)
 type Board = [Edge]
 type Score = (Int, Int) --CHANGED FROM [BOXES] TO (player1_score, player2_score), findScore function below 
 type Boxes = [Box] --Need to keep track of boxes because player that closes box matters
+<<<<<<< HEAD
 type Game = (Board, Boxes, Player, Int)
 --DONT LET THEM MAKE A GAME OF SIZE 1 IT WILL NEVER END
 --data Game = Game { board :: Board, boxes :: Boxes, turn :: Player, x :: Int, y :: Int }
+=======
+type Game = (Board, Boxes, Player)
+>>>>>>> c5ab5b2d9cc4ffc2ca9a43aca28679ceb6479d35
 --boooooopooppboppoa hfdlhg kjg
 --pretty pretty print
 opponent:: Player -> Player
@@ -75,6 +79,9 @@ moveHorizontal :: Point -> Maybe Edge
 moveHorizontal point@(x, y)
     | x == 5 = Nothing  -- Rightmost node, can't move right there should be an error msg from above
     | otherwise = Just (makeEdge point Right1) --right1 cause thats what it was abovelist of moves
+    | otherwise = Just (makeEdge point Right1) --right1 cause thats what it was above
+
+moveVertical :: Point -> Maybe Edge
 moveVertical point@(x, y)
     | y == 5 = Nothing  -- Bottom node, can't move down there should be an error msg from above
     | otherwise = Just (makeEdge point Down1) 
@@ -121,6 +128,10 @@ findWinner (board, boxes, _, _) = if p1_score > p2_score then Just P1 else if p1
 
 -- prettyPrint :: Game -> IO ()
 -- prettyPrint
+findWinner (board, boxes, _) = if p1_score > p2_score then Just P1 else if p1_score < p2_score then Just P2 else Nothing
+    where   scored = findScore boxes
+            p1_score = fst scored
+            p2_score = snd scored
 -- Build a row of edges starting at a given point
 --buildRow :: Point -> [Edge]
 --buildRow startPoint = [makeEdge startPoint Right1 | x <- [startPoint..(E, y)]]
