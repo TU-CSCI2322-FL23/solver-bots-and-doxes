@@ -11,15 +11,18 @@ type Box= (Point, Player)
 type Board = [Edge]
 type Score = (Int, Int) --CHANGED FROM [BOXES] TO (player1_score, player2_score), findScore function below 
 type Boxes = [Box] --Need to keep track of boxes because player that closes box matters
-type Game = (Board, Boxes)
+type Game = (Board, Boxes, Player)
 --boooooopooppboppoa hfdlhg kjg
 --pretty pretty print
+opponent:: Player -> Player
+opponent P1 = P2
+opponent P2 = P1
 
 makePoint:: Int -> Int -> Point
 makePoint x y = (x, y)
 
 makeDirection :: String -> Direction
-makeDirection "Right" = Right1 --conflicts with prelude def Right, so it's Right1. Could do left instead if weird naming scheme is an issue 
+makeDirection "Right" = Right1 --conflicts with prelude def Right, so it's Right1. Could do lePlayer ft instead if weird naming scheme is an issue 
 makeDirection "Down" = Down1
 makeDirection _ = error "invalid direction, only right or down permitted"
 
@@ -101,7 +104,7 @@ buildBoard = concatMap (\point -> [makeEdge point Right1, makeEdge point Down1])
 
 --assuming game inputed is a finished game
 findWinner :: Game -> Maybe Player
-findWinner (board, boxes) = if p1_score > p2_score then Just P1 else if p1_score < p2_score then Just P2 else Nothing
+findWinner (board, boxes, _) = if p1_score > p2_score then Just P1 else if p1_score < p2_score then Just P2 else Nothing
     where   scored = findScore boxes
             p1_score = fst scored
             p2_score = snd scored
