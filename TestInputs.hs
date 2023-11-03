@@ -1,5 +1,7 @@
-module test Inputs(Game) where
-import boxes
+
+module TestInputs() where
+import Boxes
+
 
 blankGame = ([],[])
 
