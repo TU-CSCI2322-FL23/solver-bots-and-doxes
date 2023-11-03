@@ -73,6 +73,9 @@ moveVertical point@(x, y)
     | y == 5 = Nothing  -- Bottom node, can't move down there should be an error msg from above
     | otherwise = Just (makeEdge point Down1) 
 
+validMove :: Edge -> Board -> Bool
+validMove edge board = notElem edge board
+
 --Board Checks
 
 isAvailable :: Board -> Point -> Direction -> Bool
@@ -108,6 +111,8 @@ findWinner (board, boxes, _) = if p1_score > p2_score then Just P1 else if p1_sc
     where   scored = findScore boxes
             p1_score = fst scored
             p2_score = snd scored
+
+
 -- Build a row of edges starting at a given point
 --buildRow :: Point -> [Edge]
 --buildRow startPoint = [makeEdge startPoint Right1 | x <- [startPoint..(E, y)]]
