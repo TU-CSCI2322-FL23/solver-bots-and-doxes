@@ -11,9 +11,12 @@ type Box= (Point, Player)
 type Board = [Edge]
 type Score = (Int, Int) --CHANGED FROM [BOXES] TO (player1_score, player2_score), findScore function below 
 type Boxes = [Box] --Need to keep track of boxes because player that closes box matters
-type Game = (Board, Boxes)
+type Game = (Board, Boxes, Player, Int)
 --boooooopooppboppoa hfdlhg kjg
 --pretty pretty print
+opponent :: Player -> Player
+opponent P1 = P2
+opponent P2 = P1
 
 amIDumb :: Point -> Point -> Point --ok 75% of the constructors weren't needed 
 amIDumb p1 p2 = ((fst p1 + fst p2) ,(snd p1 + snd p2))
@@ -118,7 +121,7 @@ buildBoard = concatMap (\point -> [makeEdge point Right1, makeEdge point Down1])
 
 --assuming game inputed is a finished game
 findWinner :: Game -> Maybe Player
-findWinner (board, boxes) = if p1_score > p2_score then Just P1 else if p1_score < p2_score then Just P2 else Nothing
+findWinner (board, boxes, _, _) = if p1_score > p2_score then Just P1 else if p1_score < p2_score then Just P2 else Nothing
     where   scored = findScore boxes
             p1_score = fst scored
             p2_score = snd scored
@@ -126,16 +129,18 @@ findWinner (board, boxes) = if p1_score > p2_score then Just P1 else if p1_score
 --type Point = (Int, Int) --making x_axis/y_axis points lets us control size of grid through constructors for each type
 --type Edge =(Point, Direction)
 
---not working, logic is decent, but if one edge ends up not making box only returns nothing 
+
 --will also probably reassign all boxes to whichever player gets passed in
 --will need another helper function to deal with it
 
+wasBoxMade :: Edge -> [Edge] -> Bool
+wasBoxMade ((x, y),Right1) edge_list = (checkBoxAtPoint (x, y) edge_list) && (checkBoxAtPoint ( x, y+1) edge_list) 
+wasBoxMade ((x, y),Down1) edge_list = (checkBoxAtPoint (x, y) edge_list) && (checkBoxAtPoint (x-1, y) edge_list) 
 
-pointstoBoxes :: [Point] -> [Edge] -> Player -> [Maybe Box]
-pointstoBoxes points edges player = [pointToBox p edges player|p<-allBoxPoints]
 
-pointToBox :: Point -> [Edge] -> Player -> Maybe Box 
-pointToBox (x, y) edge_list player = if ((e1 `elem` edge_list) && (e2 `elem` edge_list) && (e3 `elem` edge_list) && (e4 `elem` edge_list)) then Just $ makeBox (makePoint x y) player else Nothing
+
+checkBoxAtPoint :: Point -> [Edge] -> Bool 
+checkBoxAtPoint (x, y) edge_list = if ((e1 `elem` edge_list) && (e2 `elem` edge_list) && (e3 `elem` edge_list) && (e4 `elem` edge_list)) then True else False 
     where e1 = makeEdge (makePoint x y) (makeDirection "Right")
           e2 = makeEdge (makePoint x y) (makeDirection "Down")
           e3 = makeEdge (makePoint (x+1) y) (makeDirection "Down")
