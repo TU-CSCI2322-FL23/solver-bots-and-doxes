@@ -12,6 +12,7 @@ type Board = [Edge]
 type Score = (Int, Int) --CHANGED FROM [BOXES] TO (player1_score, player2_score), findScore function below 
 type Boxes = [Box] --Need to keep track of boxes because player that closes box matters
 type Game = (Board, Boxes, Player, Int)
+
 --DONT LET THEM MAKE A GAME OF SIZE 1 IT WILL NEVER END
 --data Game = Game { board :: Board, boxes :: Boxes, turn :: Player, x :: Int, y :: Int }
 --boooooopooppboppoa hfdlhg kjg
@@ -20,13 +21,16 @@ opponent:: Player -> Player
 opponent P1 = P2
 opponent P2 = P1
 
+amIDumb :: Point -> Point -> Point --ok 75% of the constructors weren't needed 
+amIDumb p1 p2 = ((fst p1 + fst p2) ,(snd p1 + snd p2))
 makePoint:: Int -> Int -> Point
 makePoint x y = (x, y)
 
 makeDirection :: String -> Direction
 makeDirection "Right" = Right1 --conflicts with prelude def Right, so it's Right1. Could do lePlayer ft instead if weird naming scheme is an issue 
+
 makeDirection "Down" = Down1
-makeDirection _ = error "invalid direction, only right or down permitted"
+makeDirection _ = error "invalid direction, only Right or Down permitted"
 
 makePlayer :: String -> Player
 makePlayer "P1" = P1
@@ -64,6 +68,21 @@ allPoints = [makePoint a one, makePoint a two, makePoint a three , makePoint a f
                  four = 4
                  five = 5
 
+allBoxPoints :: [Point]
+allBoxPoints = [makePoint a one, makePoint a two, makePoint a three , makePoint a four,
+             makePoint b one, makePoint b two, makePoint b three , makePoint b four,
+             makePoint c one, makePoint c two, makePoint c three , makePoint c four, 
+             makePoint d one, makePoint d two, makePoint d three , makePoint d four]
+           
+           where a = 1
+                 b = 2
+                 c = 3
+                 d = 4
+                 one = 1
+                 two=2
+                 three = 3
+                 four = 4
+              
  
 --MOVEMENT
 {-
@@ -128,6 +147,32 @@ findWinner (board, boxes, _, _) = if p1_score > p2_score then Just P1 else if p1
             p1_score = fst scored
             p2_score = snd scored
 
+    
+
+--type Point = (Int, Int) --making x_axis/y_axis points lets us control size of grid through constructors for each type
+--type Edge =(Point, Direction)
+
+
+--will also probably reassign all boxes to whichever player gets passed in
+--will need another helper function to deal with it
+
+--might go outside the board
+--will take in move board and 
+makeBoxes :: Edge -> Game -> [Box]
+makeBoxes = undefined 
+
+
+
+
+checkBox :: Point -> [Edge] -> Bool 
+checkBox (x, y) edge_list = if ((e1 `elem` edge_list) && (e2 `elem` edge_list) && (e3 `elem` edge_list) && (e4 `elem` edge_list)) then True else False 
+    where e1 = makeEdge (makePoint x y) (makeDirection "Right")
+          e2 = makeEdge (makePoint x y) (makeDirection "Down")
+         e3 = makeEdge (makePoint (x+1) y) (makeDirection "Down")
+         e4 = makeEdge (makePoint x (y+1)) (makeDirection "Right")
+--Build a row of edges starting at a given point
+
+
 
 -- prettyShow :: Game -> String
 -- prettyShow ([],_,_)=".   .   .   .   .\n\n"
@@ -141,6 +186,7 @@ findWinner (board, boxes, _) = if p1_score > p2_score then Just P1 else if p1_sc
 
 
 -- Build a row of edges starting at a given point
+
 --buildRow :: Point -> [Edge]
 --buildRow startPoint = [makeEdge startPoint Right1 | x <- [startPoint..(E, y)]]
 --  where (_, y) = startPoint
