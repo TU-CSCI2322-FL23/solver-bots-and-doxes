@@ -147,11 +147,41 @@ checkBox (x, y) edge_list = if ((e1 `elem` edge_list) && (e2 `elem` edge_list) &
 
 
 
--- prettyShow :: Game -> String
--- prettyShow ([],_,_)=".   .   .   .   .\n\n"
+prettyShow :: Game -> [String]
+prettyShow ([],[],_,n) = [intercalate ""(replicate n ".  ")|x<-[1..n]] 
 
--- prettyPrint :: Game -> IO ()
--- prettyPrint
+{-_ _ _
+|A|B|A|
+|A|B|C|
+|B|B|B|
+-}
+-- .  .  .
+-- .  .  .
+-- .  .  .
+
+{-
+
+.--.--.
+|P1|P2|
+.--.--.
+|P2|P2|
+.--.--.
+
+
+
+-}
+prettyPrint :: Game -> IO ()
+prettyPrint game = do
+        let strings = prettyShow game
+        mapM_ putStrLn strings
+        
+
+
+
+
+
+
+
 
 
 -- Build a row of edges starting at a given point
