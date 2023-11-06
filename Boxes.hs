@@ -133,43 +133,14 @@ findWinner (board, boxes, _, _) = if p1_score > p2_score then Just P1 else if p1
 --might go outside the board
 --will take in move board and 
 makeBoxes :: Edge -> Game -> [Box] --this needs to be tested asap 
-makeBoxes move@(point@(x, y), Rgt) game@(board, boxes, player, _) =
-    --[(p, player) | p <- [(x,y-1), point], checkbox p board]
-    if topBoxBool
-        then if botBoxBool
-            then [(point, player), ((x,y-1), player)] --made 2 boxes
-        else [((x,y-1), player)]
-    else if botBoxBool 
-        then [(point, player)]
-    else []
-        where   topBoxBool = checkBox (x, y-1) board
-                botBoxBool = checkBox point board
-makeBoxes move@(point@(x, y), Dwn) game@(board, boxes, player, _) =
-    if leftBoxBool
-        then if rightBoxBool
-            then [(point, player), ((x-1,y), player)] --made 2 boxes
-        else [((x-1,y), player)]
-    else if rightBoxBool 
-        then [(point, player)]
-    else []
-        where   leftBoxBool = checkBox (x-1, y) board
-                rightBoxBool = checkBox point board
-
-            -- if(checkBox point board) then
-            --     if((y-1 > 0) && checkBox (x,y-1) board)
-            --         then  [(point, player), ((x,y-1), player)]
-            --     else [(point, player)]
-            -- else if((y-1>0) && checkBox(x,y-1) board)
-            --         then [(x,y-1),player)]
-            --     else []
-
+makeBoxes move@(point@(x, y), Rgt) game@(board, boxes, player, _) = [(p, player) | p <- [(x,y-1), point], checkBox p (move:board)]
+makeBoxes move@(point@(x, y), Dwn) game@(board, boxes, player, _) = [(p, player) | p <- [(x-1,y), point], checkBox p (move:board)]
 
 
 --Returns boolean if there's a box originating (top left point of the box) from a given point. 
 checkBox :: Point -> [Edge] -> Bool 
-checkBox (x, y) edge_list =
-    traceShow ((x,y), edge_list) $ and [edge `elem` edge_list | edge <- boxEdges]
-    where boxEdges = [((x, y), Rgt), makeEdge (makePoint x y) (makeDirection "Down"), makeEdge (makePoint (x+1) y) (makeDirection "Down") ,  makeEdge (makePoint x (y+1)) (makeDirection "Right")]
+checkBox (x, y) edge_list = and [edge `elem` edge_list | edge <- boxEdges]
+    where boxEdges = [((x, y), Rgt), ((x,y),Dwn), ((x+1,y),Dwn) ,  ((x,y+1),Rgt)]
 --Build a row of edges starting at a given point
 
 
