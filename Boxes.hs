@@ -11,7 +11,7 @@ type Box= (Point, Player)
 type Board = [Edge]
 type Score = (Int, Int) --CHANGED FROM [BOXES] TO (player1_score, player2_score), findScore function below 
 type Boxes = [Box] --Need to keep track of boxes because player that closes box matters
-type Game = (Board, Boxes, Player, Integer)
+type Game = (Board, Boxes, Player, Int)
 
 --DONT LET THEM MAKE A GAME OF SIZE 1 IT WILL NEVER END
 --data Game = Game { board :: Board, boxes :: Boxes, turn :: Player, x :: Int, y :: Int }
@@ -72,13 +72,16 @@ moveVertical point@(x, y)
 validMove :: Edge -> Board -> Bool
 validMove edge board = notElem edge board
 
+isInBounds :: Game -> Edge -> Bool
+isInBounds game@(_, _, _ ,size) move@((x, y), _) = if move `elem` allPossibleEdges then True else False 
+        where allPossibleEdges =[((x, y), dir) | x <- [1..size-1], y <- [1..size-1], dir <- [Right1, Down1]] 
+
 -- What moves are legal for a game state (Game -> [Move] ). in this case Board is game and edge is move
 
---Noah comment: Yo this is wrong. All possible edges includes some non-legal ones. (right edges on the right end, down edges on the bottom)
-legalMoves :: Board -> [Edge]
-legalMoves board = filter (\edge -> validMove edge board) allPossibleEdges --aPE will have to change is we change the size of board
-    where
-        allPossibleEdges = [makeEdge (x, y) dir | x <- [1..4], y <- [1..4], dir <- [Right1, Down1]] --hardcoded for 1..4 board
+--legalMoves :: Game -> [Edge]
+--legalMoves game@(board, boxes, player, int)  = filter (\edge -> validMove edge board) allPossibleEdges --aPE will have to change is we change the size of board
+--    where
+--        allPossibleEdges = [((x, y), dir) | x <- [1..int-1], y <- [1..int-1], dir <- [Right1, Down1]] 
 
 --Board Checks
 
@@ -147,12 +150,13 @@ checkBox (x, y) edge_list = (e1 `elem` edge_list) && (e2 `elem` edge_list) && (e
           e4 = makeEdge (makePoint x (y+1)) (makeDirection "Right")
 --Build a row of edges starting at a given point
 
---Noah note: valid move might need to only work on (n-1) points. Should be able to get any edge u want. 
+
 --Noah note 2: would it need to determine winner at some point?
 --Takes a Game state and an edge (move) and returns the new game state. 
 makeMove :: Game -> Edge -> Game
 makeMove game@(board, boxes, player, int) move
-  | not (validMove move board) = error "Invalid Move" --if not a valid more, throw error 
+  | not (validMove move board) = error "Invalid Move, it already exists." --if not a valid more, throw error 
+  |not (isInBounds game move) = error "Invalid Move, out of Bounds"
   | null newBoxes = (move:board, boxes, opponent player, int) --if list of new boxes is empty, return new game w/move added to board, same boxes, switch player
   | otherwise = (move:board, newBoxes++boxes, player, int) --if new boxes, return new game w/move added to board, the nex boxes made added to existing boxes, same player
   where
