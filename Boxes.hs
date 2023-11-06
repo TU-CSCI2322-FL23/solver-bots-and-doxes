@@ -11,7 +11,7 @@ type Box= (Point, Player)
 type Board = [Edge]
 type Score = (Int, Int) --CHANGED FROM [BOXES] TO (player1_score, player2_score), findScore function below 
 type Boxes = [Box] --Need to keep track of boxes because player that closes box matters
-type Game = (Board, Boxes, Player, Int)
+type Game = (Board, Boxes, Player, Integer)
 
 --DONT LET THEM MAKE A GAME OF SIZE 1 IT WILL NEVER END
 --data Game = Game { board :: Board, boxes :: Boxes, turn :: Player, x :: Int, y :: Int }
@@ -29,7 +29,7 @@ makePoint x y = (x, y)
 
 makeDirection :: String -> Direction
 makeDirection "Right" = Right1 --conflicts with prelude def Right, so it's Right1. Could do lePlayer ft instead if weird naming scheme is an issue 
-
+ 
 makeDirection "Down" = Down1
 makeDirection _ = error "invalid direction, only Right or Down permitted"
 
