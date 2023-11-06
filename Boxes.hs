@@ -149,7 +149,32 @@ checkBox (x, y) edge_list = if ((e1 `elem` edge_list) && (e2 `elem` edge_list) &
 
 prettyShow :: Game -> [String]
 prettyShow ([],[],_,n) = [intercalate ""(replicate n ".  ")|x<-[1..n]] 
+prettyShow (_,boxes,_,n) = undefined 
+    
+-- assign each point the value to compare to give points of boxes
+--grid = [[((x,y),".")|y<-[0..(n-1)]|x<-[0..(n-1)]]
+--it will be a list of lists of tuples with a point and a "." , so each list is a row
 
+comparePoints :: Box -> Box -> Ordering
+comparePoints ((x1, y1),_) ((x2, y2),_) =
+    case compare x1 x2 of
+        EQ -> compare y1 y2
+        other -> other
+-- sortBy comparePoints boxes
+-- boxes will be in order
+
+
+
+--( 1) order the boxes with the boxes on the same row
+
+{-
+
+.--.--.
+|P2|  
+.--.  .
+
+
+-}
 {-_ _ _
 |A|B|A|
 |A|B|C|
@@ -167,6 +192,10 @@ prettyShow ([],[],_,n) = [intercalate ""(replicate n ".  ")|x<-[1..n]]
 |P2|P2|
 .--.--.
 
+.--.--.
+|P1|P2|
+.--.--.
+|  |  
 
 
 -}
