@@ -128,7 +128,7 @@ findWinner (board, boxes, _, _) = if p1_score > p2_score then Just P1 else if p1
 
 --might go outside the board
 --will take in move board and 
-makeBoxes :: Edge -> Game -> [Box]
+makeBoxes :: Edge -> Game -> [Box] --this needs to be tested asap 
 makeBoxes move@(point@(x, y), direc) game@(board, boxes, player, _) =
             if(checkBox point board) then
                 if((y-1 > 0) && checkBox (x,y-1) board)
@@ -138,8 +138,8 @@ makeBoxes move@(point@(x, y), direc) game@(board, boxes, player, _) =
 
 
 
-
-checkBox :: Point -> [Edge] -> Bool
+--Returns boolean if there's a box originating (top left point of the box) from a given point. 
+checkBox :: Point -> [Edge] -> Bool 
 checkBox (x, y) edge_list = (e1 `elem` edge_list) && (e2 `elem` edge_list) && (e3 `elem` edge_list) && (e4 `elem` edge_list)
     where e1 = makeEdge (makePoint x y) (makeDirection "Right")
           e2 = makeEdge (makePoint x y) (makeDirection "Down")
@@ -147,11 +147,14 @@ checkBox (x, y) edge_list = (e1 `elem` edge_list) && (e2 `elem` edge_list) && (e
           e4 = makeEdge (makePoint x (y+1)) (makeDirection "Right")
 --Build a row of edges starting at a given point
 
+--Noah note: valid move might need to only work on (n-1) points. Should be able to get any edge u want. 
+--Noah note 2: would it need to determine winner at some point?
+--Takes a Game state and an edge (move) and returns the new game state. 
 makeMove :: Game -> Edge -> Game
 makeMove game@(board, boxes, player, int) move
-  | not (validMove move board) = error "Invalid Move"
-  | null newBoxes = (move:board, boxes, opponent player, int)
-  | otherwise = (move:board, newBoxes++boxes, player, int)
+  | not (validMove move board) = error "Invalid Move" --if not a valid more, throw error 
+  | null newBoxes = (move:board, boxes, opponent player, int) --if list of new boxes is empty, return new game w/move added to board, same boxes, switch player
+  | otherwise = (move:board, newBoxes++boxes, player, int) --if new boxes, return new game w/move added to board, the nex boxes made added to existing boxes, same player
   where
       newBoxes = makeBoxes move game
 
