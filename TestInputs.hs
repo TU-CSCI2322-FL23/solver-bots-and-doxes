@@ -3,13 +3,16 @@ module TestInputs() where
 import Boxes
 
 
-blankGame = ([],[])
+blankGame = ([],[], P1, 3)
+-- .   .   .
+--
+-- .   .   .
+--
+-- .   .   .
 
---p1WinGame = Game :: ()
-
---box originating at 1, 1
-1edge1 = makeEdge (makePoint 0 0 ) (makeDirection "right")
-1edge2 = makeEdge (makePoint 0 0)(makeDirection "down")
-1edge3 = makeEdge (makePoint 1 0)(makeDirection "down")
-1edge4 = makeEdge (makePoint 0 1) (makeDirection "right") 
-
+oneBoxGame = ([((1,1) "Right"), ((1,1)"Down"), ((2,1)"Down"), ((1,2)"Right")], [((1,1), P1)], P1, 3)
+-- . — .   .
+-- | 1 |
+-- . — .   .
+--
+-- .   .   .

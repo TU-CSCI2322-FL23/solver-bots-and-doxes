@@ -1,5 +1,5 @@
 module Boxes where
-import Data.List 
+import Data.List
 --LETS GET THIS SHIT DONE
 --list of letters for the horizontal axis, list of numbers for vertical axis (numbers start at top, then go down, top left is A1)
 --was getting mad for something like Y_axis = 1|2|3|4|5
@@ -7,7 +7,7 @@ type Point = (Int, Int) --making x_axis/y_axis points lets us control size of gr
 data Direction = Right1 | Down1  deriving (Show, Eq) --Right1 cuz Right conflicts w/ special word        --added (Eq)
 data Player = P1 | P2 deriving (Show, Eq)
 type Edge =(Point, Direction)
-type Box= (Point, Player) 
+type Box= (Point, Player)
 type Board = [Edge]
 type Score = (Int, Int) --CHANGED FROM [BOXES] TO (player1_score, player2_score), findScore function below 
 type Boxes = [Box] --Need to keep track of boxes because player that closes box matters
@@ -38,19 +38,19 @@ makePlayer "P1" = P1
 makePlayer "P2" = P2
 
 makeEdge :: Point -> Direction -> Edge --should cover cases for out of bounds moves (for 5x5 grid)
-makeEdge p d = (p, d) 
+makeEdge p d = (p, d)
 
-makeBox :: Point -> Player -> Box 
+makeBox :: Point -> Player -> Box
 makeBox point player = (point, player)
 
 makeBoard :: [Edge] -> Board
-makeBoard edges = edges 
+makeBoard edges = edges
 
 findScore :: Boxes -> Score --still takes [Box], called Boxes for consistency with gamestate tracking
 findScore boxes = (length p1, length p2)
                 where (p1, p2) =partition (\(_, player) -> player == P1) boxes --splits into p1's/p2's boxes 
- 
- 
+
+
 --MOVEMENT
 {-
 moveHorizontal :: Point -> Maybe Edge
@@ -64,10 +64,10 @@ moveVertical point@(x, y)
     | y == 5 = Nothing  -- Bottom node, can't move down there should be an error msg from above
     | otherwise = Just (makeEdge point Down1) 
 -}
-makeMove :: Board -> Edge -> Player -> Maybe Board
-makeMove board edge player
-    | validMove edge board = Just (edge : board) --checks if move is valid if so the just edge on board -- type Board = [Edge]
-    | otherwise = Nothing
+--makeMove :: Board -> Edge -> Player -> Maybe Board
+--makeMove board edge player
+--    | validMove edge board = Just (edge : board) --checks if move is valid if so the just edge on board -- type Board = [Edge]
+--    | otherwise = Nothing
 
 validMove :: Edge -> Board -> Bool
 validMove edge board = notElem edge board
@@ -115,7 +115,7 @@ findWinner (board, boxes, _, _) = if p1_score > p2_score then Just P1 else if p1
             p1_score = fst scored
             p2_score = snd scored
 
-    
+
 
 --type Point = (Int, Int) --making x_axis/y_axis points lets us control size of grid through constructors for each type
 --type Edge =(Point, Direction)
@@ -127,25 +127,31 @@ findWinner (board, boxes, _, _) = if p1_score > p2_score then Just P1 else if p1
 --might go outside the board
 --will take in move board and 
 makeBoxes :: Edge -> Game -> [Box]
-makeBoxes move@(point@(x, y), direc) game@(board, boxes, player, _) = 
-            if(checkBox point board) then 
-                if((y-1 > 0) && checkBox (x,y-1) board) 
-                    then  [(point, player), ((x,y-1), player)] 
-                else [(point, player)] 
+makeBoxes move@(point@(x, y), direc) game@(board, boxes, player, _) =
+            if(checkBox point board) then
+                if((y-1 > 0) && checkBox (x,y-1) board)
+                    then  [(point, player), ((x,y-1), player)]
+                else [(point, player)]
             else []
 
 
 
 
-checkBox :: Point -> [Edge] -> Bool 
-checkBox (x, y) edge_list = if ((e1 `elem` edge_list) && (e2 `elem` edge_list) && (e3 `elem` edge_list) && (e4 `elem` edge_list)) then True else False 
+checkBox :: Point -> [Edge] -> Bool
+checkBox (x, y) edge_list = (e1 `elem` edge_list) && (e2 `elem` edge_list) && (e3 `elem` edge_list) && (e4 `elem` edge_list)
     where e1 = makeEdge (makePoint x y) (makeDirection "Right")
           e2 = makeEdge (makePoint x y) (makeDirection "Down")
-          e3 = makeEdge (makePoint (x+1) y) (makeDirection "Down")
+          e3 = makeEdge (makePoint (x+1) y) (makeDirection "Down") 
           e4 = makeEdge (makePoint x (y+1)) (makeDirection "Right")
 --Build a row of edges starting at a given point
 
-
+makeMove :: Game -> Edge -> Game
+makeMove game@(board, boxes, player, int) move
+  | not (validMove move board) = error "Invalid Move"
+  | null newBoxes = (move:board, boxes, opponent player, int)
+  | otherwise = (move:board, newBoxes++boxes, player, int)
+  where
+      newBoxes = makeBoxes move game
 
 -- prettyShow :: Game -> String
 -- prettyShow ([],_,_)=".   .   .   .   .\n\n"
