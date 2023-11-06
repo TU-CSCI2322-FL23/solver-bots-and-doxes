@@ -73,6 +73,8 @@ validMove :: Edge -> Board -> Bool
 validMove edge board = notElem edge board
 
 -- What moves are legal for a game state (Game -> [Move] ). in this case Board is game and edge is move
+
+--Noah comment: Yo this is wrong. All possible edges includes some non-legal ones. (right edges on the right end, down edges on the bottom)
 legalMoves :: Board -> [Edge]
 legalMoves board = filter (\edge -> validMove edge board) allPossibleEdges --aPE will have to change is we change the size of board
     where
