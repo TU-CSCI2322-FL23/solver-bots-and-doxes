@@ -18,6 +18,9 @@ type Game = (Board, Boxes, Player, Int)
 --data Game = Game { board :: Board, boxes :: Boxes, turn :: Player, x :: Int, y :: Int }
 --boooooopooppboppoa hfdlhg kjg
 --pretty pretty print
+
+--if needed at any point, would need to take in board 
+--allPossibleEdges =[((x, y), dir) | x <- [1..size-1], y <- [1..size-1], dir <- [Rgt, Dwn]] 
 opponent:: Player -> Player
 opponent P1 = P2
 opponent P2 = P1
@@ -30,7 +33,7 @@ makePoint x y = (x, y)
 
 makeDirection :: String -> Direction
 makeDirection "Right" = Rgt --conflicts with prelude def Right, so it's Right1. Could do lePlayer ft instead if weird naming scheme is an issue 
- 
+
 makeDirection "Down" = Dwn
 makeDirection _ = error "invalid direction, only Right or Down permitted"
 
@@ -74,8 +77,8 @@ validMove :: Edge -> Board -> Bool
 validMove edge board = notElem edge board
 
 isInBounds :: Game -> Edge -> Bool
-isInBounds game@(_, _, _ ,size) move@((x, y), _) = if move `elem` allPossibleEdges then True else False 
-        where allPossibleEdges =[((x, y), dir) | x <- [1..size-1], y <- [1..size-1], dir <- [Rgt, Dwn]] 
+isInBounds game@(_, _, _ ,size) ((x, y), Dwn) = (x<=size) && (x>=1) && (y<size) &&(y>=1)
+isInBounds game@(_, _, _, size) ((x, y), Rgt) = (x<size) && (x>=1) && (y<=size) && (y>=1)
 
 -- What moves are legal for a game state (Game -> [Move] ). in this case Board is game and edge is move
 
@@ -108,9 +111,7 @@ updateBoard board edge player
 
 --BUILD BOARD
 
---no longer necessary and also wrong
---buildBoard :: [Edge]
---buildBoard = concatMap (\point -> [makeEdge point Right1, makeEdge point Down1]) allPoints
+
 
 --WINNER LOGIC
 
@@ -138,7 +139,7 @@ makeBoxes move@(point@(x, y), Dwn) game@(board, boxes, player, _) = [(p, player)
 
 
 --Returns boolean if there's a box originating (top left point of the box) from a given point. 
-checkBox :: Point -> [Edge] -> Bool 
+checkBox :: Point -> [Edge] -> Bool
 checkBox (x, y) edge_list = and [edge `elem` edge_list | edge <- boxEdges]
     where boxEdges = [((x, y), Rgt), ((x,y),Dwn), ((x+1,y),Dwn) ,  ((x,y+1),Rgt)]
 --Build a row of edges starting at a given point
