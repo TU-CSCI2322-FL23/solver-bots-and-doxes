@@ -172,15 +172,40 @@ prettyShow (board,boxes,_,n) =
           updateVerticals downs horiz = 
                           let nGrid = [((x,y),"")|x<-[1..(n-1)],y<-[1..n]]
                               bars = map (\x -> if elem (fst x) (map fst downs)
-                                                then (fst x, snd x ++ "|  ")
-                                                else (fst x, snd x ++ "   ")
+                                                then (fst x, snd x ++ "|") --("|  ")
+                                                else (fst x, snd x ++ " ") --(" ")
                                                 ) nGrid
-                              orderBars = orderPoints bars
+                              addPl = writesPlayer bars boxes
+                              orderBars = orderPoints addPl--orderBars = orderPoints bars
                            in insertnewRows orderBars horiz
                              where insertnewRows :: [[(Point,String)]] -> [[(Point,String)]] -> [[(Point,String)]]
                                    insertnewRows [] []  = []
                                    insertnewRows [] [h] = [h]
                                    insertnewRows (v:vs) (h:hs) = h : [v] ++ insertnewRows vs hs 
+{-
+writesPlayer :: [(Point,String)] -> Boxes -> [(Point,String)]
+writesPlayer grid boxes = 
+                        map (\x -> if elem (fst x) (map fst boxes)
+                                                 then (fst x, snd x ++ getPlayer (lookup (fst x) boxes))
+                                                 else (fst x, snd x ++ "  ")
+                                                 ) grid
+                          where getPlayer :: Player -> String
+                                getPlayer P1 = "P1"
+                                getPlayer p2 = "P2"
+-}
+writesPlayer :: [(Point, String)] -> Boxes -> [(Point, String)]
+writesPlayer grid boxes =
+  map (\(p, s) -> case lookup p boxes of
+    Just player -> (p, s ++ getPlayer player)
+    Nothing -> (p, s ++ "  ")
+  ) grid
+
+-- Convert Player to String
+getPlayer :: Player -> String
+getPlayer P1 = "P1"
+getPlayer P2 = "P2"
+
+
 
 orderPoints :: [(Point,String)] -> [[(Point,String)]]
 orderPoints points = groupBy (\x y -> fst(fst x) == fst (fst y)) points
