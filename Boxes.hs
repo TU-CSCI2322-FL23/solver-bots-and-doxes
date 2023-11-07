@@ -1,5 +1,6 @@
 module Boxes where
 import Data.List 
+import Data.Function(on)
 --LETS GET THIS SHIT DONE
 --list of letters for the horizontal axis, list of numbers for vertical axis (numbers start at top, then go down, top left is A1)
 --was getting mad for something like Y_axis = 1|2|3|4|5
@@ -145,33 +146,52 @@ checkBox (x, y) edge_list = if ((e1 `elem` edge_list) && (e2 `elem` edge_list) &
           e4 = makeEdge (makePoint x (y+1)) (makeDirection "Right")
 --Build a row of edges starting at a given point
 
-
-
-prettyShow :: Game -> [(Point,String)]
-prettyShow ([],[],_,n) = [intercalate ""(replicate n ".  ")|x<-[1..n]] 
-
-prettyShow (board,boxes,_,n) = 
-  let (horizontals,verticals) = partition (\(_,dir) -> dir == Right1) boxes
-      startingGrid = [[((x,y),".")|y<-[1..n]]|x<-[1..n]]
-  in updateBoard horizontals verticals startingGrid
-  where updateBoard :: [Edge] -> [Edge] -> [[(Point,String)]] -> [(Point,String)]
-        updateBoard hs vs grid = 
-            let grid = [x|x<-rows]
-            in [if (fst r,_) `elem` hs then (fst r,(snd r) ++ "--") else (fst r, (snd r) ++ "  ")|r<-grid]
-            --newHorizontals = [if fst r 'elem' hs then (fst r,(snd r) ++ "--") else (fst r, (snd r)++ "  ")|r<-grid]
-
-{-
-example of how grid look 
-[[((1,1),"."),((1,2),"."),((1,3),"."),((1,4),"."),((1,5),".")],[((2,1),"."),((2,2),"."),((2,3),"."),((2,4),"."),((2,5),".")],[((3,1),"."),((3,2),"."),((3,3),"."),((3,4),"."),((3,5),".")],[((4,1),"."),((4,2),"."),((4,3),"."),((4,4),"."),((4,5),".")],[((5,1),"."),((5,2),"."),((5,3),"."),((5,4),"."),((5,5),".")]]
--}
+combineRows :: [[(Point, String)]] -> [String]
+combineRows rows = map concatRow rows
+  where
+    concatRow :: [(Point, String)] -> String
+    concatRow = concatMap (\(_, s) -> s)
 
     
+prettyShow :: Game -> [String]
+prettyShow ([],[],_,n) = [intercalate ""(replicate n ".  ")|x<-[1..n]] 
+prettyShow (board,boxes,_,n) =  
+    let (horizontals,vertical) = partition(\(_,dir) -> dir == Right1) board
+        startingGrid = [((x,y),".")|x<-[1..n],y<-[1..n]]
+        upHoriz = updateHorizontals horizontals startingGrid
+        grouphoriz = orderPoints upHoriz
+        upVerts = updateVerticals vertical grouphoriz
+    in combineRows upVerts
+    where updateHorizontals :: [Edge] -> [(Point,String)] -> [(Point,String)]
+          updateHorizontals rights grid = 
+                                    map (\x -> if elem (fst x) (map fst rights)
+                                               then (fst x, snd x ++ "--")
+                                               else (fst x, snd x ++ "  ")
+                                               ) grid
+          updateVerticals :: [Edge] ->[[(Point,String)]] -> [[(Point,String)]]
+          updateVerticals downs horiz = 
+                          let nGrid = [((x,y),"")|x<-[1..(n-1)],y<-[1..n]]
+                              bars = map (\x -> if elem (fst x) (map fst downs)
+                                                then (fst x, snd x ++ "|  ")
+                                                else (fst x, snd x ++ "   ")
+                                                ) nGrid
+                              orderBars = orderPoints bars
+                           in insertnewRows orderBars horiz
+                             where insertnewRows :: [[(Point,String)]] -> [[(Point,String)]] -> [[(Point,String)]]
+                                   insertnewRows [] []  = []
+                                   insertnewRows [] [h] = [h]
+                                   insertnewRows (v:vs) (h:hs) = h : [v] ++ insertnewRows vs hs 
+
+orderPoints :: [(Point,String)] -> [[(Point,String)]]
+orderPoints points = groupBy (\x y -> fst(fst x) == fst (fst y)) points
+
 {-
 comparePoints :: Box -> Box -> Ordering
 comparePoints ((x1, y1),_) ((x2, y2),_) =    
         case compare x1 x2 of
         EQ -> compare y1 y2
         other -> other
+
 
 orderEdge :: Edge -> Edge -> Ordering
 orderEdge ((x1,y1),_) ((x2,y2),_) =  
@@ -192,9 +212,9 @@ orderEdge ((x1,y1),_) ((x2,y2),_) =
 
 prettyPrint :: Game -> IO ()
 prettyPrint game = do
-        let strings = [x | (y,x) <- (prettyShow game)]
+        let strings = prettyShow game
         mapM_ putStrLn strings
-        
+      
 
 
 
@@ -225,7 +245,7 @@ prettyPrint game = do
 
 
 
--- boardToString :: Board -> String
+--boardToString :: Board -> String
 -- boardToString b = x ++ "\n" ++ fst (foldl printBoxes ("",(0,0)) b)
 --   where x = fst $ foldl printHorizontal ("*",(0,0)) $ head b
 
