@@ -26,15 +26,65 @@ makeMoveTest = do
 
 
   let game1A = makeMove game2 move4 --ignore
-
+  
   print game1 -- Expected: ([(1,1,Right1)],[],P2,3)
   print game2 -- Expected: ([(1,1,Right1),(1,1,Down1)],[((1,1),P1)],P1,3)
   print game3 -- Expected: ([(1,1,Right1),(1,1,Down1),(2,1,Right1)],[((1,1),P1)],P2,3)
   print game4 -- Expected: ([(1,1,Right1),(1,1,Down1),(2,1,Right1),(1,2,Down1)],[((1,1),P1),((1,1),P2)],P1,3)
 
-
+--  print initialGame
   print game7 -- Expected: ([((1,2),Down1),((2,2),Right1),((1,3),Down1),((1,2),Right1),((2,1),Right1),((1,1),Down1),((1,1),Right1)],[],P2,4)
---  print game1A -- Expected: ([(1,1,Right1),(1,1,Down1),(2,1,Right1),(1,2,Down1)],[((1,1),P1),((1,1),P2)],P1,3)
+--  print game1A -- Expected: 
+
+-- Function to take user input for a move
+getUserMove :: IO Edge
+getUserMove = do
+  putStrLn "Enter your move (e.g., '1 1 R' for right or '2 2 D' for down):"
+  input <- getLine
+  let [xStr, yStr, directionStr] = words input
+      x = read xStr
+      y = read yStr
+      direction = readDirection directionStr
+  return ((x, y), direction)
+  where
+    readDirection "R" = Rgt
+    readDirection "D" = Dwn
+    readDirection _ = error "Invalid direction. Use 'R' for right or 'D' for down."
+-- so 1 1 D is ((1,1) Dwn)
+
+-- Test input for making moves in the game with user input, so keep 
+makeMoveTestUserInput :: IO ()
+makeMoveTestUserInput = do
+  let initialGame = ([], [], P1, 3)
+  playGame initialGame
+
+playGame :: Game -> IO ()
+playGame game = do
+  move <- getUserMove
+  let updatedGame = makeMove game move
+  putStrLn "Current game state:"
+  print updatedGame
+  if isGameOver updatedGame
+    then putStrLn "Game over!"
+    else playGame updatedGame
+
+isGameOver :: Game -> Bool
+isGameOver (_, boxes, _, size) = length boxes == (size - 1) * (size - 1) -- ignores board and players and looks at boxes compare to the size 
+
+
+{-
+findWinnerTest :: IO ()
+findWinnerTest = do
+  let game1 = ([(1,1,Rgt),(1,1,Dwn),(2,1,Rgt),(1,2,Dwn)],[((1,1),P1),((1,1),P2)],P1,3)
+  let game2 = ([(1,1,Rgt),(1,1,Dwn),(2,1,Rgt),(1,2,Dwn),(2,2,Dwn)],[((1,1),P1),((1,1),P2)],P1,3)
+
+  let winner1 = findWinner game1
+  let winner2 = findWinner game2
+
+  print winner1 -- Expected: Just P1
+  print winner2 -- Expected: Nothing
+-}
+
 
 --PREVIOUS CODE
 {-
