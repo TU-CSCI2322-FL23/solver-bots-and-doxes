@@ -147,58 +147,50 @@ checkBox (x, y) edge_list = if ((e1 `elem` edge_list) && (e2 `elem` edge_list) &
 
 
 
-prettyShow :: Game -> [String]
+prettyShow :: Game -> [(Point,String)]
 prettyShow ([],[],_,n) = [intercalate ""(replicate n ".  ")|x<-[1..n]] 
-prettyShow (_,boxes,_,n) = undefined 
-    
--- assign each point the value to compare to give points of boxes
---grid = [[((x,y),".")|y<-[0..(n-1)]|x<-[0..(n-1)]]
---it will be a list of lists of tuples with a point and a "." , so each list is a row
 
+prettyShow (board,boxes,_,n) = 
+  let (horizontals,verticals) = partition (\(_,dir) -> dir == Right1) boxes
+      startingGrid = [[((x,y),".")|y<-[1..n]]|x<-[1..n]]
+  in updateBoard horizontals verticals startingGrid
+  where updateBoard :: [Edge] -> [Edge] -> [[(Point,String)]] -> [(Point,String)]
+        updateBoard hs vs grid = 
+            let grid = [x|x<-rows]
+            in [if (fst r,_) `elem` hs then (fst r,(snd r) ++ "--") else (fst r, (snd r) ++ "  ")|r<-grid]
+            --newHorizontals = [if fst r 'elem' hs then (fst r,(snd r) ++ "--") else (fst r, (snd r)++ "  ")|r<-grid]
+
+{-
+example of how grid look 
+[[((1,1),"."),((1,2),"."),((1,3),"."),((1,4),"."),((1,5),".")],[((2,1),"."),((2,2),"."),((2,3),"."),((2,4),"."),((2,5),".")],[((3,1),"."),((3,2),"."),((3,3),"."),((3,4),"."),((3,5),".")],[((4,1),"."),((4,2),"."),((4,3),"."),((4,4),"."),((4,5),".")],[((5,1),"."),((5,2),"."),((5,3),"."),((5,4),"."),((5,5),".")]]
+-}
+
+
+    
+{-
 comparePoints :: Box -> Box -> Ordering
-comparePoints ((x1, y1),_) ((x2, y2),_) =
-    case compare x1 x2 of
+comparePoints ((x1, y1),_) ((x2, y2),_) =    
+        case compare x1 x2 of
         EQ -> compare y1 y2
         other -> other
+
+orderEdge :: Edge -> Edge -> Ordering
+orderEdge ((x1,y1),_) ((x2,y2),_) =  
+        case compare x1 x2 of
+        EQ -> compare y1 y2
+        other -> other
+-}
 -- sortBy comparePoints boxes
 -- boxes will be in order
-
-
-
---( 1) order the boxes with the boxes on the same row
-
 {-
-
-.--.--.
-|P2|  
-.--.  .
-
-
--}
-{-_ _ _
-|A|B|A|
-|A|B|C|
-|B|B|B|
--}
--- .  .  .
--- .  .  .
--- .  .  .
-
-{-
-
 .--.--.
 |P1|P2|
 .--.--.
 |P2|P2|
 .--.--.
-
-.--.--.
-|P1|P2|
-.--.--.
-|  |  
-
-
 -}
+
+
 prettyPrint :: Game -> IO ()
 prettyPrint game = do
         let strings = prettyShow game
