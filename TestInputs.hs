@@ -75,13 +75,13 @@ playGame game = do
   move <- getUserMove
   let updatedGame = makeMove game move
   putStrLn "Current game state:"
+  print (findWinner updatedGame)
   prettyPrint updatedGame
   if isGameOver updatedGame
     then putStrLn "Game over!"
     else playGame updatedGame
 
-isGameOver :: Game -> Bool
-isGameOver (_, boxes, _, size) = length boxes == (size - 1) * (size - 1) -- ignores board and players and looks at boxes compare to the size 
+
 
 
 {-
