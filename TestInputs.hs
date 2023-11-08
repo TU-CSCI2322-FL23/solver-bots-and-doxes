@@ -3,6 +3,18 @@ import System.IO.Unsafe
 import Data.List
 import Boxes
 
+initialGame = ([], [], P1, 4)
+move1 = ((1, 1), Rgt)
+move2 = ((1, 1), Dwn)
+move3 = ((2, 1), Rgt)
+move4 = ((1, 2), Dwn)
+move5 = ((1, 3), Dwn)
+move6 = ((2, 2), Rgt)
+move7 = ((1, 2), Dwn)
+game1 = makeMove initialGame move1 --logic here is that every move copies the previous game that has all last moves than keep making moves
+game2 = makeMove game1 move2
+game3 = makeMove game2 move4
+
 -- Test input for making moves in the game, to run this load testinputs and type makeMoveTest
 makeMoveTest :: IO ()
 makeMoveTest = do
