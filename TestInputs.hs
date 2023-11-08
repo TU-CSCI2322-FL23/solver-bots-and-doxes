@@ -63,7 +63,7 @@ playGame game = do
   move <- getUserMove
   let updatedGame = makeMove game move
   putStrLn "Current game state:"
-  print updatedGame
+  prettyPrint updatedGame
   if isGameOver updatedGame
     then putStrLn "Game over!"
     else playGame updatedGame

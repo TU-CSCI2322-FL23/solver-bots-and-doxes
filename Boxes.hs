@@ -144,7 +144,7 @@ checkBox :: Point -> [Edge] -> Bool
 checkBox (x, y) edge_list = and [edge `elem` edge_list | edge <- boxEdges]
     where boxEdges = [((x, y), Rgt), ((x,y),Dwn), ((x+1,y),Dwn) ,  ((x,y+1),Rgt)]
 --Build a row of edges starting at a given point
-
+-----------------------------------------------------
 combineRows :: [[(Point, String)]] -> [String]
 combineRows rows = map concatRow rows
   where
@@ -155,28 +155,30 @@ combineRows rows = map concatRow rows
 prettyShow :: Game -> [String]
 prettyShow ([],[],_,n) = [intercalate ""(replicate n ".  ")|x<-[1..n]] 
 prettyShow (board,boxes,_,n) =  
-    let (horizontals,vertical) = partition(\(_,dir) -> dir == Right1) board
-        startingGrid = [((x,y),".")|x<-[1..n],y<-[1..n]]
+    let (horizontals,vertical) = partition(\(_,dir) -> dir == Rgt) board
+        --startingGrid = [((x,y),".")|x<-[1..n],y<-[1..n]]
+        startingGrid = [[((x,y),".") |x<-[1..n]]|y<-[1..n]] --new one [[((a,b),String)]] 
         upHoriz = updateHorizontals horizontals startingGrid
-        grouphoriz = orderPoints upHoriz
-        upVerts = updateVerticals vertical grouphoriz
+        --grouphoriz = orderPoints2 upHoriz
+        upVerts = updateVerticals vertical upHoriz--grouphoriz
     in combineRows upVerts
-    where updateHorizontals :: [Edge] -> [(Point,String)] -> [(Point,String)]
-          updateHorizontals rights grid = 
-                                    map (\x -> if elem (fst x) (map fst rights)
+    where updateHorizontals :: [Edge] -> [[(Point,String)]] -> [[(Point,String)]]
+          updateHorizontals rights grid =           
+                                   [ map (\x -> if elem (fst x) (map fst rights)
                                                then (fst x, snd x ++ "--")
                                                else (fst x, snd x ++ "  ")
-                                               ) grid
+                                               ) y|y<- grid]
           updateVerticals :: [Edge] ->[[(Point,String)]] -> [[(Point,String)]]
           updateVerticals downs horiz = 
-                          let nGrid = [((x,y),"")|x<-[1..(n-1)],y<-[1..n]]
-                              bars = map (\x -> if elem (fst x) (map fst downs)
+                          let nGrid = [[((x,y),"") |x<-[1..n]]|y<-[1..n]] --changed to x<-[1..(n-1)
+                          --let nGrid = [((x,y),"")|x<-[1..(n-1)],y<-[1..n]]
+                              bars = [map (\x -> if elem (fst x) (map fst downs)
                                                 then (fst x, snd x ++ "|") --("|  ")
                                                 else (fst x, snd x ++ " ") --(" ")
-                                                ) nGrid
+                                                ) y|y<- nGrid]
                               addPl = writesPlayer bars boxes
-                              orderBars = orderPoints addPl--orderBars = orderPoints bars
-                           in insertnewRows orderBars horiz
+                              --orderBars = orderPoints2 addPl--orderBars = orderPoints bars
+                           in insertnewRows addPl horiz--orderBars horiz
                              where insertnewRows :: [[(Point,String)]] -> [[(Point,String)]] -> [[(Point,String)]]
                                    insertnewRows [] []  = []
                                    insertnewRows [] [h] = [h]
@@ -192,12 +194,12 @@ writesPlayer grid boxes =
                                 getPlayer P1 = "P1"
                                 getPlayer p2 = "P2"
 -}
-writesPlayer :: [(Point, String)] -> Boxes -> [(Point, String)]
+writesPlayer :: [[(Point, String)]] -> Boxes -> [[(Point, String)]]
 writesPlayer grid boxes =
-  map (\(p, s) -> case lookup p boxes of
+  [map (\(p, s) -> case lookup p boxes of
     Just player -> (p, s ++ getPlayer player)
     Nothing -> (p, s ++ "  ")
-  ) grid
+  ) y|y<- grid]
 
 -- Convert Player to String
 getPlayer :: Player -> String
@@ -205,10 +207,12 @@ getPlayer P1 = "P1"
 getPlayer P2 = "P2"
 
 
+orderPoints2 :: [(Point,String)] -> [[(Point,String)]]
+orderPoints2 points = groupBy (\x y-> snd(fst x) == snd (fst x)) points
 
 orderPoints :: [(Point,String)] -> [[(Point,String)]]
 orderPoints points = groupBy (\x y -> fst(fst x) == fst (fst y)) points
-
+-------------------------------------------------------------------------------
 {-
 comparePoints :: Box -> Box -> Ordering
 comparePoints ((x1, y1),_) ((x2, y2),_) =    
