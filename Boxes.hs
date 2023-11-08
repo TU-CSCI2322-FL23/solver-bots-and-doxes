@@ -48,7 +48,7 @@ checkBox (x, y) edge_list = and [edge `elem` edge_list | edge <- boxEdges]
 makeMove :: Game -> Edge -> Game
 makeMove game@(board, boxes, player, int) move
   | not (validMove move board) = error "Invalid Move, it already exists." --if not a valid more, throw error 
-  |not (isInBounds game move) = error "Invalid Move, out of Bounds"
+  | not (isInBounds game move) = error "Invalid Move, out of Bounds"
   | null newBoxes = (move:board, boxes, opponent player, int) --if list of new boxes is empty, return new game w/move added to board, same boxes, switch player
   | otherwise = (move:board, newBoxes++boxes, player, int) --if new boxes, return new game w/move added to board, the nex boxes made added to existing boxes, same player
   where
