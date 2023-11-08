@@ -1,5 +1,6 @@
 module Boxes where
-import Data.List
+import Data.List 
+import Data.Function(on)
 import Debug.Trace
 --LETS GET THIS SHIT DONE
 --list of letters for the horizontal axis, list of numbers for vertical axis (numbers start at top, then go down, top left is A1)
@@ -144,6 +145,104 @@ checkBox (x, y) edge_list = and [edge `elem` edge_list | edge <- boxEdges]
     where boxEdges = [((x, y), Rgt), ((x,y),Dwn), ((x+1,y),Dwn) ,  ((x,y+1),Rgt)]
 --Build a row of edges starting at a given point
 
+combineRows :: [[(Point, String)]] -> [String]
+combineRows rows = map concatRow rows
+  where
+    concatRow :: [(Point, String)] -> String
+    concatRow = concatMap (\(_, s) -> s)
+
+    
+prettyShow :: Game -> [String]
+prettyShow ([],[],_,n) = [intercalate ""(replicate n ".  ")|x<-[1..n]] 
+prettyShow (board,boxes,_,n) =  
+    let (horizontals,vertical) = partition(\(_,dir) -> dir == Right1) board
+        startingGrid = [((x,y),".")|x<-[1..n],y<-[1..n]]
+        upHoriz = updateHorizontals horizontals startingGrid
+        grouphoriz = orderPoints upHoriz
+        upVerts = updateVerticals vertical grouphoriz
+    in combineRows upVerts
+    where updateHorizontals :: [Edge] -> [(Point,String)] -> [(Point,String)]
+          updateHorizontals rights grid = 
+                                    map (\x -> if elem (fst x) (map fst rights)
+                                               then (fst x, snd x ++ "--")
+                                               else (fst x, snd x ++ "  ")
+                                               ) grid
+          updateVerticals :: [Edge] ->[[(Point,String)]] -> [[(Point,String)]]
+          updateVerticals downs horiz = 
+                          let nGrid = [((x,y),"")|x<-[1..(n-1)],y<-[1..n]]
+                              bars = map (\x -> if elem (fst x) (map fst downs)
+                                                then (fst x, snd x ++ "|") --("|  ")
+                                                else (fst x, snd x ++ " ") --(" ")
+                                                ) nGrid
+                              addPl = writesPlayer bars boxes
+                              orderBars = orderPoints addPl--orderBars = orderPoints bars
+                           in insertnewRows orderBars horiz
+                             where insertnewRows :: [[(Point,String)]] -> [[(Point,String)]] -> [[(Point,String)]]
+                                   insertnewRows [] []  = []
+                                   insertnewRows [] [h] = [h]
+                                   insertnewRows (v:vs) (h:hs) = h : [v] ++ insertnewRows vs hs 
+{-
+writesPlayer :: [(Point,String)] -> Boxes -> [(Point,String)]
+writesPlayer grid boxes = 
+                        map (\x -> if elem (fst x) (map fst boxes)
+                                                 then (fst x, snd x ++ getPlayer (lookup (fst x) boxes))
+                                                 else (fst x, snd x ++ "  ")
+                                                 ) grid
+                          where getPlayer :: Player -> String
+                                getPlayer P1 = "P1"
+                                getPlayer p2 = "P2"
+-}
+writesPlayer :: [(Point, String)] -> Boxes -> [(Point, String)]
+writesPlayer grid boxes =
+  map (\(p, s) -> case lookup p boxes of
+    Just player -> (p, s ++ getPlayer player)
+    Nothing -> (p, s ++ "  ")
+  ) grid
+
+-- Convert Player to String
+getPlayer :: Player -> String
+getPlayer P1 = "P1"
+getPlayer P2 = "P2"
+
+
+
+orderPoints :: [(Point,String)] -> [[(Point,String)]]
+orderPoints points = groupBy (\x y -> fst(fst x) == fst (fst y)) points
+
+{-
+comparePoints :: Box -> Box -> Ordering
+comparePoints ((x1, y1),_) ((x2, y2),_) =    
+        case compare x1 x2 of
+        EQ -> compare y1 y2
+        other -> other
+
+
+orderEdge :: Edge -> Edge -> Ordering
+orderEdge ((x1,y1),_) ((x2,y2),_) =  
+        case compare x1 x2 of
+        EQ -> compare y1 y2
+        other -> other
+-}
+-- sortBy comparePoints boxes
+-- boxes will be in order
+{-
+.--.--.
+|P1|P2|
+.--.--.
+|P2|P2|
+.--.--.
+-}
+
+
+prettyPrint :: Game -> IO ()
+prettyPrint game = do
+        let strings = prettyShow game
+        mapM_ putStrLn strings
+      
+
+
+
+
 
 --Noah note 2: would it need to determine winner at some point?
 --Takes a Game state and an edge (move) and returns the new game state. 
@@ -156,11 +255,7 @@ makeMove game@(board, boxes, player, int) move
   where
       newBoxes = makeBoxes move game
 
--- prettyShow :: Game -> String
--- prettyShow ([],_,_)=".   .   .   .   .\n\n"
 
--- prettyPrint :: Game -> IO ()
--- prettyPrint
 
 
 -- Build a row of edges starting at a given point
@@ -184,7 +279,7 @@ makeMove game@(board, boxes, player, int) move
 
 
 
--- boardToString :: Board -> String
+--boardToString :: Board -> String
 -- boardToString b = x ++ "\n" ++ fst (foldl printBoxes ("",(0,0)) b)
 --   where x = fst $ foldl printHorizontal ("*",(0,0)) $ head b
 
