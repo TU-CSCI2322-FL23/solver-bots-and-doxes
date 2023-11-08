@@ -32,6 +32,9 @@ findWinner (board, boxes, _, _) = if p1_score > p2_score then Just P1 else if p1
             p1_score = fst scored
             p2_score = snd scored
 
+isGameOver :: Game -> Bool
+isGameOver (_, boxes, _, size) = length boxes == (size - 1) * (size - 1) -- ignores board and players and looks at boxes compare to the size 
+
 --makes boxes
 makeBoxes :: Edge -> Game -> [Box] 
 makeBoxes move@(point@(x, y), Rgt) game@(board, boxes, player, _) = [(p, player) | p <- [(x,y-1), point], checkBox p (move:board)]
