@@ -56,23 +56,7 @@ findScore boxes = (length p1, length p2)
                 where (p1, p2) =partition (\(_, player) -> player == P1) boxes --splits into p1's/p2's boxes 
 
 
---MOVEMENT
-{-
-moveHorizontal :: Point -> Maybe Edge
-moveHorizontal point@(x, y)
-    | x == 5 = Nothing  -- Rightmost node, can't move right there should be an error msg from above
-    | otherwise = Just (makeEdge point Right1) --right1 cause thats what it was abovelist of moves
-    | otherwise = Just (makeEdge point Right1) --right1 cause thats what it was above
 
-moveVertical :: Point -> Maybe Edge
-moveVertical point@(x, y)
-    | y == 5 = Nothing  -- Bottom node, can't move down there should be an error msg from above
-    | otherwise = Just (makeEdge point Down1) 
--}
---makeMove :: Board -> Edge -> Player -> Maybe Board
---makeMove board edge player
---    | validMove edge board = Just (edge : board) --checks if move is valid if so the just edge on board -- type Board = [Edge]
---    | otherwise = Nothing
 
 validMove :: Edge -> Board -> Bool
 validMove edge board = notElem edge board
@@ -90,25 +74,6 @@ isInBounds game@(_, _, _, size) ((x, y), Rgt) = (x<size) && (x>=1) && (y<=size) 
 
 --Board Checks
 
-isAvailable :: Board -> Point -> Direction -> Bool
-isAvailable board point direction = notElem (makeEdge point direction) board
-
-isHorizontal :: Edge -> Bool
-isHorizontal (_, direction) = direction == Rgt --right1 cause thats what it was above
-
-isVertical :: Edge -> Bool
-isVertical (_, direction) = direction == Dwn
-
-isValid :: Board -> Edge -> Bool
-isValid board edge@(point, direction) =
-    isWithinBounds point && isAvailable board point direction
-    where
-        isWithinBounds (x, y) = x /= 5 && y /= 5
-
-updateBoard :: Board -> Edge -> Player -> Maybe Board -- maybe it should be put edge in board and if that edge meakes a square set a boolean to true?
-updateBoard board edge player
-    | isValid board edge = Just (edge : board)
-    | otherwise = Nothing
 
 --BUILD BOARD
 
@@ -139,10 +104,10 @@ makeBoxes move@(point@(x, y), Rgt) game@(board, boxes, player, _) = [(p, player)
 makeBoxes move@(point@(x, y), Dwn) game@(board, boxes, player, _) = [(p, player) | p <- [(x-1,y), point], checkBox p (move:board)]
 
 
---Returns boolean if there's a box originating (top left point of the box) from a given point. 
+--Returns boolean if there's a box originating (top left point of the box) from a given point. --AUDREY SEAL OF APPROVAL
 checkBox :: Point -> [Edge] -> Bool
 checkBox (x, y) edge_list = and [edge `elem` edge_list | edge <- boxEdges]
-    where boxEdges = [((x, y), Rgt), ((x,y),Dwn), ((x+1,y),Dwn) ,  ((x,y+1),Rgt)]
+    where boxEdges = [((x, y), Rgt), ((x,y),Dwn), ((x+1,y),Dwn) , ((x,y+1),Rgt)]
 --Build a row of edges starting at a given point
 
 combineRows :: [[(Point, String)]] -> [String]
@@ -155,7 +120,7 @@ combineRows rows = map concatRow rows
 prettyShow :: Game -> [String]
 prettyShow ([],[],_,n) = [intercalate ""(replicate n ".  ")|x<-[1..n]] 
 prettyShow (board,boxes,_,n) =  
-    let (horizontals,vertical) = partition(\(_,dir) -> dir == Right1) board
+    let (horizontals,vertical) = partition(\(_,dir) -> dir == Rgt) board
         startingGrid = [((x,y),".")|x<-[1..n],y<-[1..n]]
         upHoriz = updateHorizontals horizontals startingGrid
         grouphoriz = orderPoints upHoriz
