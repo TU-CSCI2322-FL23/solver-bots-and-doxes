@@ -156,10 +156,8 @@ prettyShow :: Game -> [String]
 prettyShow ([],[],_,n) = [intercalate ""(replicate n ".  ")|x<-[1..n]] 
 prettyShow (board,boxes,_,n) =  
     let (horizontals,vertical) = partition(\(_,dir) -> dir == Rgt) board
-        --startingGrid = [((x,y),".")|x<-[1..n],y<-[1..n]]
         startingGrid = [[((x,y),".") |x<-[1..n]]|y<-[1..n]] --new one [[((a,b),String)]] 
         upHoriz = updateHorizontals horizontals startingGrid
-        --grouphoriz = orderPoints2 upHoriz
         upVerts = updateVerticals vertical upHoriz--grouphoriz
     in combineRows upVerts
     where updateHorizontals :: [Edge] -> [[(Point,String)]] -> [[(Point,String)]]
@@ -171,29 +169,17 @@ prettyShow (board,boxes,_,n) =
           updateVerticals :: [Edge] ->[[(Point,String)]] -> [[(Point,String)]]
           updateVerticals downs horiz = 
                           let nGrid = [[((x,y),"") |x<-[1..n]]|y<-[1..n]] --changed to x<-[1..(n-1)
-                          --let nGrid = [((x,y),"")|x<-[1..(n-1)],y<-[1..n]]
                               bars = [map (\x -> if elem (fst x) (map fst downs)
                                                 then (fst x, snd x ++ "|") --("|  ")
                                                 else (fst x, snd x ++ " ") --(" ")
                                                 ) y|y<- nGrid]
                               addPl = writesPlayer bars boxes
-                              --orderBars = orderPoints2 addPl--orderBars = orderPoints bars
                            in insertnewRows addPl horiz--orderBars horiz
                              where insertnewRows :: [[(Point,String)]] -> [[(Point,String)]] -> [[(Point,String)]]
                                    insertnewRows [] []  = []
                                    insertnewRows [] [h] = [h]
                                    insertnewRows (v:vs) (h:hs) = h : [v] ++ insertnewRows vs hs 
-{-
-writesPlayer :: [(Point,String)] -> Boxes -> [(Point,String)]
-writesPlayer grid boxes = 
-                        map (\x -> if elem (fst x) (map fst boxes)
-                                                 then (fst x, snd x ++ getPlayer (lookup (fst x) boxes))
-                                                 else (fst x, snd x ++ "  ")
-                                                 ) grid
-                          where getPlayer :: Player -> String
-                                getPlayer P1 = "P1"
-                                getPlayer p2 = "P2"
--}
+
 writesPlayer :: [[(Point, String)]] -> Boxes -> [[(Point, String)]]
 writesPlayer grid boxes =
   [map (\(p, s) -> case lookup p boxes of
