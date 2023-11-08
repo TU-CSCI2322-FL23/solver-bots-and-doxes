@@ -70,6 +70,18 @@ makeMove game@(board, boxes, player, int) move
   where
       newBoxes = makeBoxes move game
 
+--Alternative version that returns the same game if invalid move, message can be dealt with in IO
+--ex. if same game returned, print message saying an invalid move was entered 
+--not tested :(
+--makeMove :: Game -> Edge -> Game
+--makeMove game@(board, boxes, player, int) move
+--  | not (validMove move board) ||not (isInBounds game move) = (board, boxes, player, int) --would return the same game(wihtout the invalid move)
+--  | not (isInBounds game move) = error "Invalid Move, out of Bounds"
+--  | null newBoxes = (move:board, boxes, opponent player, int) --if list of new boxes is empty, return new game w/move added to board, same boxes, switch player
+--  | otherwise = (move:board, newBoxes++boxes, player, int) --if new boxes, return new game w/move added to board, the nex boxes made added to existing boxes, same player
+--  where
+--      newBoxes = makeBoxes move game
+
 
 --PRETTY PRINT SECTION
 combineRows :: [[(Point, String)]] -> [String]
