@@ -40,7 +40,8 @@ readDirection "D" = Dwn
 
 showGame :: Game -> String --takes a game and converts the game state into a string using the unlines function.
 showGame (board, boxes, player, size) =
-    unlines [unwords $ map showEdge board, unwords $ map showBox boxes, showPlayer player, show size]
+      unlines [intercalate ";" (map showEdge board), intercalate ";" (map showBox boxes), showPlayer player, show size]
+--    unlines [unwords $ map showEdge board, unwords $ map showBox boxes, showPlayer player, show size]
 
 -- Helper functions for converting individual components to strings 
 showEdge :: Edge -> String
@@ -67,7 +68,7 @@ loadGame :: FilePath -> IO Game -- readFile: An IO action that reads the content
 loadGame filePath = do
     content <- readFile filePath
     return $ readGame content
-    --let sampleGame2 = ([((1,2),Down1),((2,2),Right1)], [((1,1),P2)], P1, 3)
+    --let sampleGame2 = ([((1,2),Dwn),((2,2),Rgt)], [((1,1),P2)], P1, 3)
 --loadedGame <- loadGame "testGame.txt"        writeGame sampleGame "testGame.txt"          let sampleGame = ([], [], P1, 3) 
 {-
 -- IO action to compute and print the best move along with the outcome it forces. Note: this is very untested the cmd should be "putBestMove loadedGame" with 
