@@ -36,3 +36,50 @@ readDirection :: String -> Direction
 readDirection "R" = Rgt
 readDirection "D" = Dwn
 
+
+
+showGame :: Game -> String
+showGame (board, boxes, player, size) =
+    unlines [unwords $ map showEdge board, unwords $ map showBox boxes, showPlayer player, show size]
+
+-- Helper functions for converting individual components to strings 
+showEdge :: Edge -> String
+showEdge ((x, y), dir) = unwords [show x, show y, showDirection dir]
+
+showBox :: Box -> String
+showBox ((x, y), player) = unwords [show x, show y, showPlayer player]
+
+showPlayer :: Player -> String
+showPlayer P1 = "P1"
+showPlayer P2 = "P2"
+
+showDirection :: Direction -> String
+showDirection Rgt = "R"
+showDirection Dwn = "D"
+
+
+-- IO action to write a game state to a file
+writeGame :: Game -> FilePath -> IO ()
+writeGame game filePath = writeFile filePath (showGame game)
+
+-- IO action to load a game state from a file
+loadGame :: FilePath -> IO Game
+loadGame filePath = do
+    content <- readFile filePath
+    return $ readGame content
+    --let sampleGame2 = ([((1,2),Down1),((2,2),Right1)], [((1,1),P2)], P1, 3)
+--loadedGame <- loadGame "testGame.txt"        writeGame sampleGame "testGame.txt"          let sampleGame = ([], [], P1, 3) 
+{-
+-- IO action to compute and print the best move along with the outcome it forces. Note: this is very untested the cmd should be "putBestMove loadedGame" with 
+putBestMove :: Game -> IO ()
+putBestMove game = do
+    let move = bestMove game
+        outcome = findWinner (makeMove game move)
+    putStrLn $ "Best Move: " ++ showEdge move
+    putStrLn $ "Forces Outcome: " ++ show outcome
+
+-- Main IO action
+main :: IO ()
+main = do main
+
+-}
