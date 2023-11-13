@@ -6,7 +6,7 @@ module TestInputs where
 
 
  whoWillWinTest1 :: Game
- whoWillWinTest1 = ([((1, 1), Rgt), ((1, 1), Dwn), ((2, 1), Dwn), ((3, 1),Dwn), ((2, 2), Dwn), ((1, 3), Rgt), ((2, 3), Rgt)], [], P1, 3) 
+ whoWillWinTest1 = ([((1, 1), Rgt), ((1, 1), Dwn), ((1, 2), Dwn), ((3, 1),Dwn), ((2, 2), Rgt), ((1, 3), Rgt), ((2, 3), Rgt), ((2, 1), Dwn)], [], P1, 3) 
 
 -- initialGame = ([], [], P1, 4)
 -- move1 = ((1, 1), Rgt)
