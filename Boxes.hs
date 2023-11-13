@@ -28,7 +28,7 @@ isInBounds :: Game -> Edge -> Bool
 isInBounds game@(_, _, _ ,size) ((x, y), Dwn) = (x<=size) && (x>=1) && (y<size) &&(y>=1)
 isInBounds game@(_, _, _, size) ((x, y), Rgt) = (x<size) && (x>=1) && (y<=size) && (y>=1)
 
---assuming game inputed is a finished game
+--returns Nothing if an unfinished game
 findWinner :: Game -> Maybe Outcome
 findWinner (board, boxes, _, size)
   | p1_score +p2_score< ((size-1) *(size-1)) = Nothing
