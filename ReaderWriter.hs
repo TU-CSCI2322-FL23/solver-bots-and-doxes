@@ -1,29 +1,59 @@
 import Boxes
 import Data.List
 import Data.List.Split
+import Solver
+import Data.Maybe
+import System.Environment
+import Debug.Trace
+import Text.Read
+import GHC.Generics (R, D)
+import Distribution.Compat.Lens (_1)
+
 
 readGame :: String -> Game
-readGame string = (boardFinal, boxesFinal, readPlayer player, read int)
-    where   [boardy, boxesy, player ,int] = lines string
-            board = splitOn ";" boardy
-            boxes = splitOn ";" boxesy
-            boardFinal = [readEdge x | x <- board]
-            boxesFinal = [readBox x | x <- boxes]
+readGame string =
+    case lines string of
+        [boardy, boxesy, player, int] ->
+            let board = splitOn ";" boardy
+                boxes = splitOn ";" boxesy
+                boardFinal = catMaybes [readEdge x | x <- board, not $ null x]
+                boxesFinal = catMaybes [readBox x | x <- boxes, not $ null x]
+    
+            in (boardFinal, boxesFinal, readPlayer player, read int)
+        _ -> error $ "Invalid file: " ++ show (lines string)
+readEdge :: String -> Maybe Edge
+readEdge str = aux ((x',y'),dir')
+      where [x,y,dir] = words str
+            x' = readMaybe x
+            y' = readMaybe y
+            dir' = maybeReadDirection dir
+            aux :: ((Maybe Int,Maybe Int), Maybe Direction) -> Maybe Edge
+            aux ((Just x, Just y),Just z) = Just ((x,y),z) 
+            aux _ = Nothing
 
-readEdge :: String -> Edge
-readEdge str = ((x',y'),dir')
-    where   [x,y,dir] = words str
-            x' = read x
-            y' = read y
-            dir' = readDirection dir
+maybeReadDirection :: String -> Maybe Direction
+maybeReadDirection x 
+    |x == "R" = Just Rgt
+    |x == "D" = Just Dwn 
+    |otherwise = Nothing
 
-readBox :: String -> Box
-readBox str = ((x',y'),play')
-    where   [x,y, play] = words str
-            x' = read x
-            y' = read y
-            play' = readPlayer play
 
+readBox :: String ->Maybe Box
+readBox str =    
+    case words str of
+        [x,y, play] -> 
+            do  x' <- readMaybe x
+                y' <- readMaybe y
+                play' <- maybeReadPlayer play
+                Just ((x',y'),play')
+        lst -> traceShow lst Nothing
+
+
+maybeReadPlayer :: String -> Maybe Player
+maybeReadPlayer x 
+    |x == "P1" = Just P1
+    |x == "P2" = Just P2 
+    |otherwise = Nothing
 
 readPlayer :: String -> Player
 readPlayer "P1" = P1
@@ -68,8 +98,17 @@ loadGame :: FilePath -> IO Game -- readFile: An IO action that reads the content
 loadGame filePath = do
     content <- readFile filePath
     return $ readGame content
-    --let sampleGame2 = ([((1,2),Dwn),((2,2),Rgt)], [((1,1),P2)], P1, 3)
+    --let sampleGame = ([((1,1),Rgt),((1,1),Dwn),((1,2),Dwn),((3,1),Dwn),((2,2),Rgt),((1,3),Rgt),((2,3),Rgt),((2,1),Dwn)],[],P1,3)
 --loadedGame <- loadGame "testGame.txt"        writeGame sampleGame "testGame.txt"          let sampleGame = ([], [], P1, 3) 
+--putBestMove loadedGame
+--putBestMove (ANY GAME)
+putBestMove :: Game -> IO ()
+putBestMove game = do
+    let move = bestMove game
+        updatedGame = fromMaybe game (makeMove game move)
+        outcome = findWinner updatedGame
+    putStrLn $ "Best Move: " ++ showEdge move
+    putStrLn $ "Forces Outcome: " ++ show outcome
 {-
 -- IO action to compute and print the best move along with the outcome it forces. Note: this is very untested the cmd should be "putBestMove loadedGame" with 
 putBestMove :: Game -> IO () -- If you have a game state currentGame and you want to find and print the best move, you would call putBestMove currentGame.
@@ -78,9 +117,19 @@ putBestMove game = do
         outcome = findWinner (makeMove game move)
     putStrLn $ "Best Move: " ++ showEdge move
     putStrLn $ "Forces Outcome: " ++ show outcome
-
+-}
+-- :main testGame.txt
 -- Main IO action
 main :: IO ()
-main = do main
+main = do
+    args <- getArgs
+    case args of
+        [filePath] -> do
+            loadedGame <- loadGame filePath
+            putStrLn "Loaded Game State:"
+            prettyPrint loadedGame
+            putStrLn "Computing and Printing Best Move:"
+            putBestMove loadedGame
+        _ -> putStrLn "Please provide a file path as an argument."
 
--}
+
