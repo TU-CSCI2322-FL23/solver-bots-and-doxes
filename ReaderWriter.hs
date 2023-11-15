@@ -10,7 +10,7 @@ import GHC.Generics (R, D)
 import Distribution.Compat.Lens (_1)
 
 
-readGame :: String -> Game
+readGame :: String -> Maybe Game
 readGame string =
     case lines string of
         [boardy, boxesy, player, int] ->
@@ -55,36 +55,36 @@ maybeReadPlayer x
     |x == "P2" = Just P2 
     |otherwise = Nothing
 
-readPlayer :: String -> Player
+readPlayer :: String -> Maybe Player
 readPlayer "P1" = P1
 readPlayer "P2" = P2
 
-readInt :: String -> Int
+readInt :: String -> Maybe Int
 readInt str = read str
 
-readDirection :: String -> Direction
+readDirection :: String -> Maybe Direction
 readDirection "R" = Rgt
 readDirection "D" = Dwn
 
 
 
-showGame :: Game -> String --takes a game and converts the game state into a string using the unlines function.
+showGame :: Maybe Game -> String --takes a game and converts the game state into a string using the unlines function.
 showGame (board, boxes, player, size) =
       unlines [intercalate ";" (map showEdge board), intercalate ";" (map showBox boxes), showPlayer player, show size]
 --    unlines [unwords $ map showEdge board, unwords $ map showBox boxes, showPlayer player, show size]
 
 -- Helper functions for converting individual components to strings 
-showEdge :: Edge -> String
+showEdge :: Maybe Edge -> String
 showEdge ((x, y), dir) = unwords [show x, show y, showDirection dir]
 
-showBox :: Box -> String
+showBox :: Maybe Box -> String
 showBox ((x, y), player) = unwords [show x, show y, showPlayer player]
 
-showPlayer :: Player -> String -- I now realise we have a getPlayer
+showPlayer :: Maybe Player -> String -- I now realise we have a getPlayer
 showPlayer P1 = "P1"
 showPlayer P2 = "P2"
 
-showDirection :: Direction -> String
+showDirection :: Maybe Direction -> String
 showDirection Rgt = "R"
 showDirection Dwn = "D"
 
