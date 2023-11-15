@@ -131,5 +131,3 @@ main = do
             putStrLn "Computing and Printing Best Move:"
             putBestMove loadedGame
         _ -> putStrLn "Please provide a file path as an argument."
-
-
