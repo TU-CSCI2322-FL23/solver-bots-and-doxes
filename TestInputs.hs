@@ -5,9 +5,19 @@ module TestInputs where
 
 
 
- whoWillWinTest1 :: Game
+ whoWillWinTest1 :: Game --P1 expected
  whoWillWinTest1 = ([((1, 1), Rgt), ((1, 1), Dwn), ((1, 2), Dwn), ((3, 1),Dwn), ((2, 2), Rgt), ((1, 3), Rgt), ((2, 3), Rgt), ((2, 1), Dwn)], [], P1, 3) 
 
+ whoWillWinTest2 :: Game --Tie expected 
+ whoWillWinTest2 = ([((1, 1), Rgt), ((1, 1), Dwn), ((2, 1), Dwn), ((2, 1), Rgt), ((1, 2), Dwn), ((1, 2), Rgt), ((2, 2), Dwn), ((1, 3), Rgt), ((2, 3), Rgt), ((3, 2), Dwn)], [((1, 1),P1),((1, 2), P1)], P2, 3)
+
+ bestMoveTest1 :: Game --((2, 2), Rgt) expected, attempts to force tie 
+ bestMoveTest1 = ([((1, 1), Rgt), ((1, 1), Dwn), ((2, 1), Dwn), ((2, 1), Rgt), ((1, 2), Dwn), ((1, 2), Rgt), ((2, 2), Dwn), ((1, 3), Rgt), ((2, 3), Rgt), ((3, 2), Dwn)], [((1, 1),P1),((1, 2), P1)], P2, 3)
+
+ bestMoveTest2 :: Game  --((2, 1), Rgt) 
+ bestMoveTest2 = ([((1,1), Dwn), ((2, 1), Dwn), ((3, 1), Dwn), ((1, 2), Dwn), ((1, 3), Rgt), ((2, 3), Rgt)], [], P1, 3)
+
+ 
 -- initialGame = ([], [], P1, 4)
 -- move1 = ((1, 1), Rgt)
 -- move2 = ((1, 1), Dwn)
