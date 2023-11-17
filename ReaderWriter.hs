@@ -8,19 +8,22 @@ import Debug.Trace
 import Text.Read
 import GHC.Generics (R, D)
 import Distribution.Compat.Lens (_1)
+import System.Directory
 
 
 readGame :: String -> Maybe Game
 readGame string =
     case lines string of
-        [boardy, boxesy, player, int] ->
+        [boardy, boxesy, player, int] -> do
             let board = splitOn ";" boardy
                 boxes = splitOn ";" boxesy
-                boardFinal = catMaybes [readEdge x | x <- board, not $ null x]
-                boxesFinal = catMaybes [readBox x | x <- boxes, not $ null x]
-    
-            in (boardFinal, boxesFinal, readPlayer player, read int)
+            boardFinal <- sequence [readEdge x | x <- board, not $ null x]
+            boxesFinal <- sequence [readBox x | x <- boxes, not $ null x]
+            player' <- maybeReadPlayer player
+            size' <- readMaybe int
+            return (boardFinal, boxesFinal, player', size')
         _ -> error $ "Invalid file: " ++ show (lines string)
+
 readEdge :: String -> Maybe Edge
 readEdge str = aux ((x',y'),dir')
       where [x,y,dir] = words str
@@ -28,20 +31,20 @@ readEdge str = aux ((x',y'),dir')
             y' = readMaybe y
             dir' = maybeReadDirection dir
             aux :: ((Maybe Int,Maybe Int), Maybe Direction) -> Maybe Edge
-            aux ((Just x, Just y),Just z) = Just ((x,y),z) 
+            aux ((Just x, Just y),Just z) = Just ((x,y),z)
             aux _ = Nothing
 
 maybeReadDirection :: String -> Maybe Direction
-maybeReadDirection x 
+maybeReadDirection x
     |x == "R" = Just Rgt
-    |x == "D" = Just Dwn 
+    |x == "D" = Just Dwn
     |otherwise = Nothing
 
 
 readBox :: String ->Maybe Box
-readBox str =    
+readBox str =
     case words str of
-        [x,y, play] -> 
+        [x,y, play] ->
             do  x' <- readMaybe x
                 y' <- readMaybe y
                 play' <- maybeReadPlayer play
@@ -50,54 +53,79 @@ readBox str =
 
 
 maybeReadPlayer :: String -> Maybe Player
-maybeReadPlayer x 
+maybeReadPlayer x
     |x == "P1" = Just P1
-    |x == "P2" = Just P2 
+    |x == "P2" = Just P2
     |otherwise = Nothing
 
-readPlayer :: String -> Maybe Player
-readPlayer "P1" = P1
-readPlayer "P2" = P2
+
 
 readInt :: String -> Maybe Int
-readInt str = read str
+readInt = read
 
 readDirection :: String -> Maybe Direction
-readDirection "R" = Rgt
-readDirection "D" = Dwn
+readDirection x
+    |x == "R" = Just Rgt
+    |x == "L" = Just Dwn
+    |otherwise = Nothing
 
 
 
-showGame :: Maybe Game -> String --takes a game and converts the game state into a string using the unlines function.
-showGame (board, boxes, player, size) =
-      unlines [intercalate ";" (map showEdge board), intercalate ";" (map showBox boxes), showPlayer player, show size]
---    unlines [unwords $ map showEdge board, unwords $ map showBox boxes, showPlayer player, show size]
+showGame :: Game -> Maybe String
+showGame (board, boxes, player, size) = do
+    edgeStrings <- mapM showEdge board
+    boxStrings <- mapM showBox boxes
+    playerStr <- showPlayer player
+    return $ unlines [intercalate ";" edgeStrings, intercalate ";" boxStrings, playerStr, show size]
 
--- Helper functions for converting individual components to strings 
-showEdge :: Maybe Edge -> String
-showEdge ((x, y), dir) = unwords [show x, show y, showDirection dir]
+showEdge :: Edge -> Maybe String
+showEdge ((x, y), dir) = do
+    xStr <- showMaybe x
+    yStr <- showMaybe y
+    dirStr <- showDirection dir
+    return $ unwords [xStr, yStr, dirStr]
 
-showBox :: Maybe Box -> String
-showBox ((x, y), player) = unwords [show x, show y, showPlayer player]
+showBox :: Box -> Maybe String
+showBox ((x, y), player) = do
+    xStr <- showMaybe x
+    yStr <- showMaybe y
+    playerStr <- showPlayer player
+    return $ unwords [xStr, yStr, playerStr]
 
-showPlayer :: Maybe Player -> String -- I now realise we have a getPlayer
-showPlayer P1 = "P1"
-showPlayer P2 = "P2"
+-- Add a helper function to handle Maybe String conversion
+showMaybe :: Show a => a -> Maybe String
+showMaybe x = Just (show x)
 
-showDirection :: Maybe Direction -> String
-showDirection Rgt = "R"
-showDirection Dwn = "D"
+showPlayer :: Player -> Maybe String
+showPlayer x
+    |x == P1 = Just "P1"
+    |x == P2 = Just "P2"
+    |otherwise = Nothing
 
+showDirection :: Direction -> Maybe String
+showDirection x
+    |x == Rgt = Just "R"
+    |x == Dwn = Just "D"
+    |otherwise = Nothing
 
+-- takes a game than converts it into a file, writeFile: An IO action that writes the content to a file. filePath: The file path where the game state will be stored.
 -- IO action to write a game state to a file
-writeGame :: Game -> FilePath -> IO () -- takes a game than converts it into a file, writeFile: An IO action that writes the content to a file. filePath: The file path where the game state will be stored.
-writeGame game filePath = writeFile filePath (showGame game)
+writeGame :: Game -> FilePath -> IO ()
+writeGame board file = do
+    writeFile file (show board)
+    return ()
 
 -- IO action to load a game state from a file
-loadGame :: FilePath -> IO Game -- readFile: An IO action that reads the content of a file. readGame: Converts the string content from the file into a game state
-loadGame filePath = do
-    content <- readFile filePath
-    return $ readGame content
+-- readFile: An IO action that reads the content of a file. readGame: Converts the string content from the file into a game state
+loadGame :: FilePath -> IO (Maybe Game) 
+loadGame file = do
+  b <- doesFileExist file
+  if b 
+      then do
+        contents <- readFile file
+        return $ readMaybe contents
+      else return Nothing
+
     --let sampleGame = ([((1,1),Rgt),((1,1),Dwn),((1,2),Dwn),((3,1),Dwn),((2,2),Rgt),((1,3),Rgt),((2,3),Rgt),((2,1),Dwn)],[],P1,3)
 --loadedGame <- loadGame "testGame.txt"        writeGame sampleGame "testGame.txt"          let sampleGame = ([], [], P1, 3) 
 --putBestMove loadedGame
