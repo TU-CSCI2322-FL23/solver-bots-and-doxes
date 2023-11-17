@@ -5,18 +5,18 @@ import qualified Data.Set as Set
 import Data.Maybe
 import Data.List
 
-bestMove :: Game -> Edge --an edge is a move :)
+bestMove :: Game -> Maybe Edge --an edge is a move :)
 bestMove game@(_,_,player,_) = pickMove player moveOutcomes'
       where  moves = validMoves game 
              moveOutcomes = catMaybes $ map liftMaybe [(makeMove game x, x) | x <- moves]
              moveOutcomes' = [(whoWillWin x, y) | (x,y) <- moveOutcomes]
 
-pickMove :: Player -> [(Outcome, Edge)] -> Edge
+pickMove :: Player -> [(Outcome, Edge)] -> Maybe Edge
 pickMove player lst = case winningTuple of
-                    Just (_,winningMove) -> winningMove
+                    Just (_,winningMove) -> Just winningMove
                     Nothing -> case findTie of 
-                           Just (_, tieMove) -> tieMove
-                           Nothing -> snd $ head lst --booo nooo dont use head WHO CARES
+                           Just (_, tieMove) -> Just tieMove
+                           Nothing -> Nothing
                     where  winningTuple = find (\(x,y) -> x==(Players player)) lst
                            findTie = find (\(x,y) -> x==Tie) lst
 

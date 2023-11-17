@@ -114,9 +114,11 @@ writeGame :: Game -> FilePath -> IO ()
 writeGame board file = do
     writeFile file (show board)
     return ()
+--ghci> let sampleGameString = "1 1 Rgt;2 2 Dwn;3 3 Rgt\n4 4 P1;5 5 P2\nP1\n3"
 
 -- IO action to load a game state from a file
 -- readFile: An IO action that reads the content of a file. readGame: Converts the string content from the file into a game state
+{-
 loadGame :: FilePath -> IO (Maybe Game) 
 loadGame file = do
   b <- doesFileExist file
@@ -125,11 +127,12 @@ loadGame file = do
         contents <- readFile file
         return $ readMaybe contents
       else return Nothing
-
+-}
     --let sampleGame = ([((1,1),Rgt),((1,1),Dwn),((1,2),Dwn),((3,1),Dwn),((2,2),Rgt),((1,3),Rgt),((2,3),Rgt),((2,1),Dwn)],[],P1,3)
 --loadedGame <- loadGame "testGame.txt"        writeGame sampleGame "testGame.txt"          let sampleGame = ([], [], P1, 3) 
 --putBestMove loadedGame
 --putBestMove (ANY GAME)
+{-
 putBestMove :: Game -> IO ()
 putBestMove game = do
     let move = bestMove game
@@ -159,3 +162,5 @@ main = do
             putStrLn "Computing and Printing Best Move:"
             putBestMove loadedGame
         _ -> putStrLn "Please provide a file path as an argument."
+
+-}
