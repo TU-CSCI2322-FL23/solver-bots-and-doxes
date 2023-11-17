@@ -41,7 +41,7 @@ maybeReadDirection x
     |otherwise = Nothing
 
 
-readBox :: String ->Maybe Box
+readBox :: String -> Maybe Box
 readBox str =
     case words str of
         [x,y, play] ->
@@ -71,96 +71,75 @@ readDirection x
 
 
 
-showGame :: Game -> Maybe String
-showGame (board, boxes, player, size) = do
-    edgeStrings <- mapM showEdge board
-    boxStrings <- mapM showBox boxes
-    playerStr <- showPlayer player
-    return $ unlines [intercalate ";" edgeStrings, intercalate ";" boxStrings, playerStr, show size]
+showGame :: Game -> String --takes a game and converts the game state into a string using the unlines function.
+showGame (board, boxes, player, size) =
+      unlines [intercalate ";" (map showEdge board), intercalate ";" (map showBox boxes), showPlayer player, show size]
+--    unlines [unwords $ map showEdge board, unwords $ map showBox boxes, showPlayer player, show size]
 
-showEdge :: Edge -> Maybe String
-showEdge ((x, y), dir) = do
-    xStr <- showMaybe x
-    yStr <- showMaybe y
-    dirStr <- showDirection dir
-    return $ unwords [xStr, yStr, dirStr]
+showEdge :: Edge -> String
+showEdge ((x, y), dir) = unwords [show x, show y, showDirection dir]
 
-showBox :: Box -> Maybe String
-showBox ((x, y), player) = do
-    xStr <- showMaybe x
-    yStr <- showMaybe y
-    playerStr <- showPlayer player
-    return $ unwords [xStr, yStr, playerStr]
+showBox :: Box -> String
+showBox ((x, y), player) = unwords [show x, show y, showPlayer player]
 
--- Add a helper function to handle Maybe String conversion
-showMaybe :: Show a => a -> Maybe String
-showMaybe x = Just (show x)
 
-showPlayer :: Player -> Maybe String
-showPlayer x
-    |x == P1 = Just "P1"
-    |x == P2 = Just "P2"
-    |otherwise = Nothing
+showPlayer :: Player -> String
+showPlayer P1 = "P1"
+showPlayer P2 = "P2"
 
-showDirection :: Direction -> Maybe String
-showDirection x
-    |x == Rgt = Just "R"
-    |x == Dwn = Just "D"
-    |otherwise = Nothing
+showDirection :: Direction -> String
+showDirection Rgt = "R"
+showDirection Dwn = "D"
 
 -- takes a game than converts it into a file, writeFile: An IO action that writes the content to a file. filePath: The file path where the game state will be stored.
 -- IO action to write a game state to a file
 writeGame :: Game -> FilePath -> IO ()
 writeGame board file = do
-    writeFile file (show board)
+    writeFile file (showGame board)
     return ()
---ghci> let sampleGameString = "1 1 Rgt;2 2 Dwn;3 3 Rgt\n4 4 P1;5 5 P2\nP1\n3"
+--ghci> let sampleGameString = "1 1 R;2 2 D;3 3 R\n4 4 P1;5 5 P2\nP1\n3"
 
 -- IO action to load a game state from a file
 -- readFile: An IO action that reads the content of a file. readGame: Converts the string content from the file into a game state
-{-
+
 loadGame :: FilePath -> IO (Maybe Game) 
 loadGame file = do
   b <- doesFileExist file
   if b 
       then do
         contents <- readFile file
-        return $ readMaybe contents
+        return $ readGame contents
       else return Nothing
--}
+
     --let sampleGame = ([((1,1),Rgt),((1,1),Dwn),((1,2),Dwn),((3,1),Dwn),((2,2),Rgt),((1,3),Rgt),((2,3),Rgt),((2,1),Dwn)],[],P1,3)
 --loadedGame <- loadGame "testGame.txt"        writeGame sampleGame "testGame.txt"          let sampleGame = ([], [], P1, 3) 
 --putBestMove loadedGame
 --putBestMove (ANY GAME)
-{-
+
 putBestMove :: Game -> IO ()
 putBestMove game = do
-    let move = bestMove game
-        updatedGame = fromMaybe game (makeMove game move)
-        outcome = findWinner updatedGame
-    putStrLn $ "Best Move: " ++ showEdge move
-    putStrLn $ "Forces Outcome: " ++ show outcome
-{-
--- IO action to compute and print the best move along with the outcome it forces. Note: this is very untested the cmd should be "putBestMove loadedGame" with 
-putBestMove :: Game -> IO () -- If you have a game state currentGame and you want to find and print the best move, you would call putBestMove currentGame.
-putBestMove game = do
-    let move = bestMove game
-        outcome = findWinner (makeMove game move)
-    putStrLn $ "Best Move: " ++ showEdge move
-    putStrLn $ "Forces Outcome: " ++ show outcome
--}
+    case (bestMove game) of 
+        Just move -> 
+               do case (makeMove game move) of
+                    Just updatedGame ->
+                        do let outcome = whoWillWin updatedGame
+                           putStrLn $ "Best Move: " ++ showEdge move
+                           putStrLn $ "Forces Outcome: " ++ show outcome
+                    Nothing -> putStrLn "Something went wrong :("
+        Nothing -> putStrLn "No move can win or tie, sorry :("
 -- :main testGame.txt
 -- Main IO action
 main :: IO ()
 main = do
     args <- getArgs
     case args of
-        [filePath] -> do
-            loadedGame <- loadGame filePath
-            putStrLn "Loaded Game State:"
-            prettyPrint loadedGame
-            putStrLn "Computing and Printing Best Move:"
-            putBestMove loadedGame
-        _ -> putStrLn "Please provide a file path as an argument."
+        [filePath] -> 
+            do  game <- loadGame filePath
+                case game of
+                    Just loadedGame -> 
+                        do putStrLn "Loaded Game State:"
+                           prettyPrint loadedGame
+                           putStrLn "Computing and Printing Best Move:"
+                           putBestMove loadedGame
+                    Nothing -> putStrLn "Invalid file path."
 
--}
