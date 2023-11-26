@@ -43,5 +43,3 @@ allPossibleEdges size = rgts ++ dwns
   where  rgts = [((x,y), Rgt) | x <- [1..size-1], y <- [1..size]]
          dwns = [((x,y), Dwn) | x <- [1..size], y<-[1..size-1]]
 
-validMoves :: Game -> [Edge]  
-validMoves (board,_,_,size) = allPossibleEdges size \\ board

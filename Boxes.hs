@@ -54,7 +54,7 @@ checkBox (x, y) edge_list = and [edge `elem` edge_list | edge <- boxEdges]
     where boxEdges = [((x, y), Rgt), ((x,y),Dwn), ((x+1,y),Dwn) , ((x,y+1),Rgt)]
 --Build a row of edges starting at a given point
 
---not tested :(
+
 makeMove :: Game -> Edge -> Maybe Game
 makeMove game@(board, boxes, player, int) move
   | not (validMove move board) ||not (isInBounds game move) = Nothing 
@@ -63,6 +63,8 @@ makeMove game@(board, boxes, player, int) move
   where
       newBoxes = makeBoxes move game
 
+validMoves :: Game -> [Edge]  
+validMoves (board,_,_,size) = allPossibleEdges size \\ board
 --PRETTY PRINT SECTION
 combineRows :: [[(Point, String)]] -> [String]
 combineRows rows = map concatRow rows
