@@ -1,3 +1,4 @@
+module ReaderWriter where
 import Boxes
 import Data.List
 import Data.List.Split
@@ -129,17 +130,5 @@ putBestMove game = do
         Nothing -> putStrLn "No move can win or tie, sorry :("
 -- :main testGame.txt
 -- Main IO action
-main :: IO ()
-main = do
-    args <- getArgs
-    case args of
-        [filePath] -> 
-            do  game <- loadGame filePath
-                case game of
-                    Just loadedGame -> 
-                        do putStrLn "Loaded Game State:"
-                           prettyPrint loadedGame
-                           putStrLn "Computing and Printing Best Move:"
-                           putBestMove loadedGame
-                    Nothing -> putStrLn "Invalid file path."
+
 
