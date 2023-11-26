@@ -25,8 +25,8 @@ validMove :: Edge -> Board -> Bool
 validMove edge board = notElem edge board
 
 isInBounds :: Game -> Edge -> Bool
-isInBounds game@(_, _, _ ,size) ((x, y), Dwn) = (x<=size) && (x>=1) && (y<size) &&(y>=1)
-isInBounds game@(_, _, _, size) ((x, y), Rgt) = (x<size) && (x>=1) && (y<=size) && (y>=1)
+isInBounds (_, _, _ ,size) ((x, y), Dwn) = (x<=size) && (x>=1) && (y<size) &&(y>=1)
+isInBounds (_, _, _, size) ((x, y), Rgt) = (x<size) && (x>=1) && (y<=size) && (y>=1)
 
 --returns Nothing if an unfinished game
 findWinner :: Game -> Maybe Outcome
@@ -44,8 +44,10 @@ isGameOver (_, boxes, _, size) = length boxes == (size - 1) * (size - 1) -- igno
 
 --makes boxes
 makeBoxes :: Edge -> Game -> [Box] 
-makeBoxes move@(point@(x, y), Rgt) game@(board, boxes, player, _) = [(p, player) | p <- [(x,y-1), point], checkBox p (move:board)]
-makeBoxes move@(point@(x, y), Dwn) game@(board, boxes, player, _) = [(p, player) | p <- [(x-1,y), point], checkBox p (move:board)]
+makeBoxes move@(point@(x, y), Rgt) (board, _, player, _) = 
+  [(p, player) | p <- [(x,y-1), point], checkBox p (move:board)]
+makeBoxes move@(point@(x, y), Dwn) (board, _, player, _) = 
+  [(p, player) | p <- [(x-1,y), point], checkBox p (move:board)]
 
 
 --Returns boolean if there's a box originating (top left point of the box) from a given point. --AUDREY SEAL OF APPROVAL
@@ -65,6 +67,13 @@ makeMove game@(board, boxes, player, int) move
 
 validMoves :: Game -> [Edge]  
 validMoves (board,_,_,size) = allPossibleEdges size \\ board
+
+allPossibleEdges :: Int -> [Edge]
+allPossibleEdges size = rgts ++ dwns 
+  where  rgts = [((x,y), Rgt) | x <- [1..size-1], y <- [1..size]]
+         dwns = [((x,y), Dwn) | x <- [1..size], y<-[1..size-1]]
+
+
 --PRETTY PRINT SECTION
 combineRows :: [[(Point, String)]] -> [String]
 combineRows rows = map concatRow rows
