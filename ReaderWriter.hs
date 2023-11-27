@@ -25,7 +25,7 @@ readGame string =
             return (boardFinal, boxesFinal, player', size')
         _ -> error $ "Invalid file: " ++ show (lines string)
 
-readEdge :: String -> Maybe Edge
+{-readEdge :: String -> Maybe Edge
 readEdge str = aux ((x',y'),dir')
       where [x,y,dir] = words str
             x' = readMaybe x
@@ -34,6 +34,20 @@ readEdge str = aux ((x',y'),dir')
             aux :: ((Maybe Int,Maybe Int), Maybe Direction) -> Maybe Edge
             aux ((Just x, Just y),Just z) = Just ((x,y),z)
             aux _ = Nothing
+-}
+
+
+readEdge :: String -> Maybe Edge
+readEdge str = 
+    case words str of
+        [xStr,yStr,dirStr] ->
+            do x <- readMaybe xStr
+               y <- readMaybe yStr
+               dir <- maybeReadDirection dirStr
+               Just ((x,y),dir)
+          _ -> Nothing
+
+
 
 maybeReadDirection :: String -> Maybe Direction
 maybeReadDirection x
