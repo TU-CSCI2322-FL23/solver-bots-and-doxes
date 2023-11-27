@@ -39,4 +39,15 @@ pickOutcome player lst
 
 
 
+-------Last Sprint --------
+rateGame :: Game -> Int
+rateGame = undefined
+
+whoMightWin :: Game -> Int -> (Int,Move)
+whoMightWin = undefined
+
+
+
+
+
 
