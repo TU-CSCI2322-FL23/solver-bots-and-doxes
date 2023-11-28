@@ -40,12 +40,12 @@ readEdge str = aux ((x',y'),dir')
 readEdge :: String -> Maybe Edge
 readEdge str = 
     case words str of
-        [xStr,yStr,dirStr] ->
-            do x <- readMaybe xStr
-               y <- readMaybe yStr
-               dir <- maybeReadDirection dirStr
-               Just ((x,y),dir)
-          _ -> Nothing
+       [xStr,yStr,dirStr] -> 
+          do x <- readMaybe xStr
+             y <- readMaybe yStr
+             dir <- maybeReadDirection dirStr
+             Just ((x,y),dir)
+       _ -> Nothing
 
 
 
@@ -57,6 +57,17 @@ maybeReadDirection x
 
 
 readBox :: String -> Maybe Box
+readBox str = case words str of
+    [x, y, play] -> do
+        x' <- readMaybe x
+        y' <- readMaybe y
+        play' <- maybeReadPlayer play
+        Just ((x', y'), play')
+    _ -> Nothing
+
+
+{-}
+readBox :: String -> Maybe Box
 readBox str =
     case words str of
         [x,y, play] ->
@@ -65,7 +76,7 @@ readBox str =
                 play' <- maybeReadPlayer play
                 Just ((x',y'),play')
         lst -> traceShow lst Nothing
-
+-}
 
 maybeReadPlayer :: String -> Maybe Player
 maybeReadPlayer x

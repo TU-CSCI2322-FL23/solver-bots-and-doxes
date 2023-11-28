@@ -40,14 +40,69 @@ pickOutcome player lst
 
 
 -------Last Sprint --------
+--{-
 rateGame :: Game -> Int
-rateGame = undefined
+rateGame game@(board, boxes, player, size)
+    | isGameOver game = evaluateOutcome (findWinner game) player
+    | otherwise = evaluatePosition game player
 
-whoMightWin :: Game -> Int -> (Int,Move)
-whoMightWin = undefined
+evaluateOutcome :: Maybe Outcome -> Player -> Int
+evaluateOutcome (Just (Players p)) currentPlayer
+    | p == currentPlayer = 100  -- Winning the game is highly favorable
+    | otherwise = -100  -- Losing the game is highly unfavorable
+evaluateOutcome (Just Tie) _ = 0  -- A tie is neutral
+evaluateOutcome Nothing _ = 0  -- Game is ongoing, no outcome yet
+--so if P1 is favorable than -100 else P2 for 100
+evaluatePosition :: Game -> Player -> Int
+evaluatePosition (board, boxes, player, size) currentPlayer =
+    currentPlayerBoxes - opponentBoxes
+  where
+    currentPlayerBoxes = length $ filter (\(_, p) -> p == currentPlayer) boxes
+    opponentBoxes = length $ filter (\(_, p) -> p == opponent currentPlayer) boxes
+--Note this uses isGameOver from boxes.hs
 
+--}
+--let game = ([], [], P1, 3)
+--let game1 = ([], [((1, 1), P1)], P1, 3)
+--let game2 = ([], [((1, 1), P1), ((1, 2), P2), ((3, 2), P2), ((1, 3), P2)], P2, 3)
+--rateGame game1  -- Expected output: 100
+--rateGame game2  -- Expected output: -100
+{-
+rateGame :: Game -> Int
+rateGame (_, boxes, _, _) =
+    let player1Boxes = length $ filter (\(_, player) -> player == P1) boxes
+        player2Boxes = length $ filter (\(_, player) -> player == P2) boxes
+    in player1Boxes - player2Boxes
+--in this version the evualtation is based on the number of boxes owned by P1 and P2, positive is good for P1 and negative is good for P2
+-}
+whoMightWin :: Game -> Int -> (Int, Maybe Edge)
+whoMightWin game depth =
+    maximize depth game
 
+-- The maximizing player (Player One)
+maximize :: Int -> Game -> (Int, Maybe Edge)
+maximize depth game
+    | depth == 0 || isGameOver game = (rateGame game, Nothing)
+    | otherwise =
+        foldl (\acc@(maxRating, _) move ->
+            let nextState = fromMaybe game (makeMove game move)
+                (rating, _) = minimize (depth - 1) nextState
+            in if rating > maxRating then (rating, Just move) else acc
+        ) (-1000, Nothing) (validMoves game)
+--The minimizing player (two)
+minimize :: Int -> Game -> (Int, Maybe Edge)
+minimize depth game
+    | depth == 0 || isGameOver game = (rateGame game, Nothing)
+    | otherwise =
+        foldl (\acc@(minRating, _) move ->
+            let nextState = fromMaybe game (makeMove game move)
+                (rating, _) = maximize (depth - 1) nextState
+            in if rating < minRating then (rating, Just move) else acc
+        ) (1000, Nothing) (validMoves game)
+--whoMightWin game1 3  -- Adjust the depth as needed
+--
 
+--Note: this uses fromMaybe which fogarty might not like
 
 
 
