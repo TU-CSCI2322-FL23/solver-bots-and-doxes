@@ -63,7 +63,7 @@ evaluatePosition (board, boxes, player, size) currentPlayer =
 
 --}
 --let game = ([], [], P1, 3)
---let game1 = ([], [((1, 1), P1)], P1, 3)
+--let game1 = ([(1,1) R], [((1, 1), P1)], P1, 3)
 --let game2 = ([], [((1, 1), P1), ((1, 2), P2), ((3, 2), P2), ((1, 3), P2)], P2, 3)
 --rateGame game1  -- Expected output: 100
 --rateGame game2  -- Expected output: -100
@@ -88,7 +88,7 @@ maximize depth game
             let nextState = fromMaybe game (makeMove game move)
                 (rating, _) = minimize (depth - 1) nextState
             in if rating > maxRating then (rating, Just move) else acc
-        ) (-1000, Nothing) (validMoves game)
+        ) (-100, Nothing) (validMoves game)
 --The minimizing player (two)
 minimize :: Int -> Game -> (Int, Maybe Edge)
 minimize depth game
@@ -100,7 +100,7 @@ minimize depth game
             in if rating < minRating then (rating, Just move) else acc
         ) (1000, Nothing) (validMoves game)
 --whoMightWin game1 3  -- Adjust the depth as needed
---
+--let sampleGame = ([((1,1),Rgt),((1,1),Dwn),((1,2),Dwn),((3,1),Dwn),((2,2),Rgt),((1,3),Rgt),((2,3),Rgt),((2,1),Dwn),((2,1),Rgt)],[((2,1), P1)],P1,3)
 
 --Note: this uses fromMaybe which fogarty might not like
 
