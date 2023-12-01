@@ -78,16 +78,15 @@ depthInFlags (Depth x:_) = read x
 depthInFlags (f:fs) = depthInFlags fs
 
 showOutcome :: Outcome -> String
-showOutcome Outcome Tie = "It's a tie!"
-showOutcome Outcome P1 = "User!!!"
-showOutcome Outcome P2 = "Dot!!!"
+showOutcome Tie = "It's a tie!"
+showOutcome (Players P1) = "User wins!!!"
+showOutcome (Players P2) = "Dot wins!!!"
 
 playGame :: Game -> Int -> IO()
 playGame game@(_,_,P2,_) d =
     if isGameOver game
     then do case findWinner game of   
-                Just p -> do    putStrLn "The winner is...:"
-                                putStrLn (showOutcome p)  
+                Just p -> putStrLn (showOutcome p)                           
                 Nothing -> putStrLn "devs trash gl next time"
     else do case snd $ whoMightWin game d of 
                         Just edge -> case makeMove game edge of
@@ -103,8 +102,7 @@ playGame game@(_,_,P2,_) d =
 playGame game@(_,_,P1,_) d =  
     if isGameOver game
     then do case findWinner game of   
-                Just p -> do    putStrLn "The winner is...:"
-                                putStrLn (showOutcome p)  
+                Just p -> putStrLn (showOutcome p)   
                 Nothing -> putStrLn"devs trash gl next time"
     else do move <- prompt "Enter your move:"
             case (readEdge move) of 
