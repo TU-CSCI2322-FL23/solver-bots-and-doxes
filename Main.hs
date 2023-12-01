@@ -44,19 +44,19 @@ main =
                                 then case bestMove game of
                                     Just edge -> putStrLn (showEdge edge)
                                     Nothing -> putStrLn "No way to force a win or tie, better luck next time!"
-                                else return ()
-                                case moveInFlags flags of
-                                    Just str -> case readEdge str of
-                                        Just edge -> case makeMove game edge of
-                                            Just game' -> do if Verbose `elem` flags
-                                                             then prettyPrint game'
-                                                             else putStrLn $ showGame game'
-                                            Nothing -> putStrLn "Invalid move."
-                                        Nothing -> putStrLn "Invalid input format."
-                                    Nothing -> return ()
-
-                                if Interactive `elem` flags
-                                    then playGame gamer 
+                                else case moveInFlags flags of
+                                        Just str -> case readEdge str of
+                                            Just edge -> case makeMove game edge of
+                                                Just game' -> do if Verbose `elem` flags
+                                                                 then prettyPrint game'
+                                                                 else putStrLn $ showGame game'
+                                                Nothing -> putStrLn "Invalid move."
+                                            Nothing -> putStrLn "Invalid input format."
+                                        Nothing -> case snd (whoMightWin game (depthInFlags flags)) of
+                                                        Just edge -> putStrLn $ showEdge edge
+                                                        Nothing -> putStrLn "No way to force a win or tie, better luck next time!"
+                                --if Interactive `elem` flags
+                                --    then playGame gamer 
                                         
                 Nothing -> putStrLn "Error: Game Input wrong :("
 
@@ -65,9 +65,9 @@ moveInFlags [] = Nothing
 moveInFlags (Move x:_) = Just x
 moveInFlags (f:fs) = moveInFlags fs
 
-depthInFlags :: [Flag] -> Maybe Int
-depthInFlags [] = Nothing
-depthInFlags (Depth x:_) = Just $ read x
+depthInFlags :: [Flag] -> Int
+depthInFlags [] = 5
+depthInFlags (Depth x:_) = read x
 depthInFlags (f:fs) = depthInFlags fs
 
 
@@ -77,16 +77,16 @@ depthInFlags (f:fs) = depthInFlags fs
 --   let initialGame = ([], [], P1, 3)
  --  playGame initialGame
 
- playGame :: Game -> IO ()
- playGame game = do
-   move <- getUserMove
-   let updatedGame = makeMove game move
-   putStrLn "Current game state:"
-   print (findWinner updatedGame)
-   prettyPrint updatedGame
-   if isGameOver updatedGame
-     then putStrLn "Game over!"
-     else playGame updatedGame
+--  playGame :: Game -> IO ()
+--  playGame game = do
+--    move <- getUserMove
+--    let updatedGame = makeMove game move
+--    putStrLn "Current game state:"
+--    print (findWinner updatedGame)
+--    prettyPrint updatedGame
+--    if isGameOver updatedGame
+--      then putStrLn "Game over!"
+--      else playGame updatedGame
 
 
 
