@@ -113,11 +113,20 @@ rateGame (_, boxes, _, _) =
     in player1Boxes - player2Boxes
 --in this version the evualtation is based on the number of boxes owned by P1 and P2, positive is good for P1 and negative is good for P2
 -}
+{-}
 whoMightWin :: Game -> Int -> (Int, Maybe Edge)
 whoMightWin game depth =
     maximize depth game
+-}
+--NOTE: You need at least a depth of 2 for accuracy otherwise IT DOESNT CHECK THE OTHER PLAYER TURN
+whoMightWin :: Game -> Int -> (Int, Maybe Edge)
+whoMightWin game depth =
+    if currentPlayer == P1
+        then maximize depth game
+        else minimize depth game
+    where (_, _, currentPlayer, _) = game
 
--- The maximizing player (Player One)
+-- The maximizing player (Player One) so if (100,Just ((1,2),Rgt)) that means P1 is being favored
 maximize :: Int -> Game -> (Int, Maybe Edge)
 maximize depth game
     | depth == 0 || isGameOver game = (rateGame game, Nothing)
@@ -126,7 +135,7 @@ maximize depth game
             let nextState = fromMaybe game (makeMove game move)
                 (rating, _) = minimize (depth - 1) nextState
             in if rating > maxRating then (rating, Just move) else acc
-        ) (-100, Nothing) (validMoves game)
+        ) (-1000, Nothing) (validMoves game)
 --The minimizing player (two)
 minimize :: Int -> Game -> (Int, Maybe Edge)
 minimize depth game
@@ -141,6 +150,6 @@ minimize depth game
 --let sampleGame = ([((1,1),Rgt),((1,1),Dwn),((1,2),Dwn),((3,1),Dwn),((2,2),Rgt),((1,3),Rgt),((2,3),Rgt),((2,1),Dwn),((2,1),Rgt)],[((2,1), P1)],P1,3)
 
 --Note: this uses fromMaybe which fogarty might not like
---game3 =  ( [((1,1),Rgt),((1,1),Dwn),((1,2),Dwn),((3,1),Dwn),((2,2),Rgt),((1,3),Rgt),((2,3),Rgt),((2,1),Dwn),((2,1),Rgt ),((2,2),Dwn),((3,2),Dwn)] , [((2,1), P1), ((2,2), P2)],P1,3 )
+--game3 =  ( [((1,1),Rgt),((1,1),Dwn),((1,2),Dwn),((3,1),Dwn),((2,2),Rgt),((1,3),Rgt),((2,3),Rgt),((2,1),Dwn),((2,1),Rgt ),((2,2),Dwn),((3,2),Dwn)] , [((2,1), P1), ((2,2), P2)],P1,3) 3
 
 

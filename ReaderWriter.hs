@@ -127,7 +127,7 @@ writeGame board file = do
 
 -- IO action to load a game state from a file
 -- readFile: An IO action that reads the content of a file. readGame: Converts the string content from the file into a game state
-
+{-
 loadGame :: FilePath -> IO (Maybe Game) 
 loadGame file = do
   b <- doesFileExist file
@@ -136,6 +136,17 @@ loadGame file = do
         contents <- readFile file
         return $ readGame contents
       else return Nothing
+-}
+loadGame :: FilePath -> IO Game
+loadGame file = do
+  b <- doesFileExist file
+  if b 
+      then do
+        contents <- readFile file
+        return $ fromMaybe initialGame (readGame contents)
+      else return initialGame
+  where
+    initialGame = ([],[],P1,3)
 
     --let sampleGame = ([((1,1),Rgt),((1,1),Dwn),((1,2),Dwn),((3,1),Dwn),((2,2),Rgt),((1,3),Rgt),((2,3),Rgt),((2,1),Dwn)],[],P1,3)
 --loadedGame <- loadGame "testGame.txt"        writeGame sampleGame "testGame.txt"          let sampleGame = ([], [], P1, 3) 
