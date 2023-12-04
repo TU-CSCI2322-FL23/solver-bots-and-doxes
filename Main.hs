@@ -73,7 +73,7 @@ moveInFlags (Move x:_) = Just x
 moveInFlags (f:fs) = moveInFlags fs
 
 depthInFlags :: [Flag] -> Int
-depthInFlags [] = 3
+depthInFlags [] = 7
 depthInFlags (Depth x:_) = read x
 depthInFlags (f:fs) = depthInFlags fs
 
