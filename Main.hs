@@ -10,14 +10,6 @@ import System.Environment
 import System.Console.GetOpt
 import System.IO
 
-
---import Debug.Trace
---import Text.Read
---import GHC.Generics (R, D)
---import Distribution.Compat.Lens (_1)
---import System.Directory
-
-
 data Flag = Help | Winner | Depth String | Move String | Verbose | Interactive  deriving (Eq, Show)
 
 options :: [OptDescr Flag]
@@ -34,14 +26,11 @@ main :: IO ()
 main = 
   do args <- getArgs
      let (flags, inputs, errors) =  getOpt Permute options args
-     {-let fname = case args of
-                   [] -> "fortunes.txt"
-                   (x:xs) -> x-}
      let fname = if null inputs then "blankGame.txt" else head inputs
      if Help `elem` flags
      then putStrLn $ usageInfo "Bots and Doxes [options] [file]" options
      else
-        do  gamer <- loadGame fname --Story five stuff hereish 
+        do  gamer <- loadGame fname 
             case gamer of 
                 Just game -> do if Interactive `elem` flags
                                 then playGame game (depthInFlags flags)
@@ -61,19 +50,19 @@ main =
                                                         Nothing -> putStrLn "Invalid input format."
                                                     Nothing -> case snd (whoMightWin game (depthInFlags flags)) of
                                                                     Just edge -> putStrLn $ showEdge edge
-                                                                    Nothing -> putStrLn "No way to force a win or tie, better luck next time!"
-                                            --if Interactive `elem` flags
-                                            --    then playGame gamer 
-                                        
+                                                                    Nothing -> putStrLn "No way to force a win or tie, better luck next time!"                       
                 Nothing -> putStrLn "Error: Game Input wrong :("
 
+
+--helper functions 
 moveInFlags :: [Flag] -> Maybe String
 moveInFlags [] = Nothing
 moveInFlags (Move x:_) = Just x
 moveInFlags (f:fs) = moveInFlags fs
 
+--default value is 5 if no depth specified (also functions as difficulty for the bot)
 depthInFlags :: [Flag] -> Int
-depthInFlags [] = 7
+depthInFlags [] = 5
 depthInFlags (Depth x:_) = read x
 depthInFlags (f:fs) = depthInFlags fs
 
@@ -82,28 +71,29 @@ showOutcome Tie = "It's a tie!"
 showOutcome (Players P1) = "User wins!!!"
 showOutcome (Players P2) = "Dot wins!!!"
 
+--P1 is the player, P2 is the bot
 playGame :: Game -> Int -> IO()
-playGame game@(_,_,P2,_) d =
+playGame game@(_,_,P2,_) d =  
     if isGameOver game
     then do case findWinner game of   
                 Just p -> putStrLn (showOutcome p)                           
-                Nothing -> putStrLn "devs trash gl next time"
+                Nothing -> putStrLn "Error: Please restart the module"
     else do case snd $ whoMightWin game d of 
                         Just edge -> case makeMove game edge of
                             Just game -> do putStrLn "Dot's move:"
                                             prettyPrint game
                                             playGame game d
-                            Nothing -> putStrLn "something went wrong devs trash"
+                            Nothing -> putStrLn "Error: Please restart the module"
                         Nothing -> case makeMove game (head $ validMoves game) of
                                         Just game -> do putStrLn "Dot's move:"
                                                         prettyPrint game
                                                         playGame game d
-                                        Nothing -> putStrLn "something genuinely is super wrong devs mega trash"
+                                        Nothing -> putStrLn "Error: Please restart the module"
 playGame game@(_,_,P1,_) d =  
     if isGameOver game
     then do case findWinner game of   
                 Just p -> putStrLn (showOutcome p)   
-                Nothing -> putStrLn"devs trash gl next time"
+                Nothing -> putStrLn "Error: Please restart the module"
     else do move <- prompt "Enter your move:"
             case (readEdge move) of 
                 Nothing -> do putStrLn "Invalid input format, please try again."
@@ -115,60 +105,10 @@ playGame game@(_,_,P1,_) d =
                                     prettyPrint game
                                     playGame game d
 
-
+--takes in the users move 
 prompt :: String -> IO String
 prompt question = 
   do putStr (question++" ")
      hFlush stdout
      resp <- getLine
      return resp
-
--- botPlay :: Game -> Int -> IO()
--- botPlay game d = do case snd $ whoMightWin game d of 
---                         Just edge -> case makeMove game edge of
---                             Just game -> do putStrLn "Dot's move:"
---                                             prettyPrint game
---                                             playGame d game
---                             Nothing -> putStrLn "something went wrong devs trash"
---                         Nothing -> case makeMove game (head $ validMoves game) of
---                                         Just game -> do putStrLn "Dot's move:"
---                                                         prettyPrint game
---                                                         playGame d game
---                                         Nothing -> putStrLn "something genuinely is super wrong devs mega trash"
-
- --makeMoveTestUserInput :: IO ()
--- makeMoveTestUserInput = do
---   let initialGame = ([], [], P1, 3)
- --  playGame initialGame
-
---  playGame :: Game -> IO ()
---  playGame game = do
---    move <- getUserMove
---    let updatedGame = makeMove game move
---    putStrLn "Current game state:"
---    print (findWinner updatedGame)
---    prettyPrint updatedGame
---    if isGameOver updatedGame
---      then putStrLn "Game over!"
---      else playGame updatedGame
-
-
-
-
-
-
-
-
---Neil purgatory 
---main = do
---    args <- getArgs
---    case args of
---        [filePath] -> 
---            do  game <- loadGame filePath
---                case game of
---                    Just loadedGame ->
---                        do putStrLn "Loaded Game State:"
---                           prettyPrint loadedGame
---                           putStrLn "Computing and Printing Best Move:"
---                           putBestMove loadedGame
---                    Nothing -> putStrLn "Invalid file path."

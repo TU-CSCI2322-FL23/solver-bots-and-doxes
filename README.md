@@ -1,5 +1,5 @@
 Bots and Doxes 
-Audrey
-Noah
-Daisy
-Neil
+Audrey Tollett
+Noah Wenig
+Daisy Nieto 
+Neil Flores 

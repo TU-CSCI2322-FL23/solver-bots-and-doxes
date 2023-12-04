@@ -11,7 +11,18 @@ import GHC.Generics (R, D)
 import Distribution.Compat.Lens (_1)
 import System.Directory
 
+--loads game in from a file location
+loadGame :: FilePath -> IO (Maybe Game) 
+loadGame file = do
+  valid_file <- doesFileExist file
+  if valid_file
+      then do
+        contents <- readFile file
+        return $ readGame contents
+      else return Nothing
 
+
+--takes in a string and outputs a game if it's a valid game state 
 readGame :: String -> Maybe Game
 readGame string =
     case lines string of
@@ -25,18 +36,7 @@ readGame string =
             return (boardFinal, boxesFinal, player', size')
         _ -> error $ "Invalid file: " ++ show (lines string)
 
-{-readEdge :: String -> Maybe Edge
-readEdge str = aux ((x',y'),dir')
-      where [x,y,dir] = words str
-            x' = readMaybe x
-            y' = readMaybe y
-            dir' = maybeReadDirection dir
-            aux :: ((Maybe Int,Maybe Int), Maybe Direction) -> Maybe Edge
-            aux ((Just x, Just y),Just z) = Just ((x,y),z)
-            aux _ = Nothing
--}
-
-
+--helper functions for load/read game below:
 readEdge :: String -> Maybe Edge
 readEdge str = 
     case words str of
@@ -66,18 +66,6 @@ readBox str = case words str of
     _ -> Nothing
 
 
-{-}
-readBox :: String -> Maybe Box
-readBox str =
-    case words str of
-        [x,y, play] ->
-            do  x' <- readMaybe x
-                y' <- readMaybe y
-                play' <- maybeReadPlayer play
-                Just ((x',y'),play')
-        lst -> traceShow lst Nothing
--}
-
 maybeReadPlayer :: String -> Maybe Player
 maybeReadPlayer x
     |x == "P1" = Just P1
@@ -100,7 +88,7 @@ readDirection x
 showGame :: Game -> String --takes a game and converts the game state into a string using the unlines function.
 showGame (board, boxes, player, size) =
       unlines [intercalate ";" (map showEdge board), intercalate ";" (map showBox boxes), showPlayer player, show size]
---    unlines [unwords $ map showEdge board, unwords $ map showBox boxes, showPlayer player, show size]
+
 
 showEdge :: Edge -> String
 showEdge ((x, y), dir) = unwords [show x, show y, showDirection dir]
@@ -123,20 +111,6 @@ writeGame :: Game -> FilePath -> IO ()
 writeGame board file = do
     writeFile file (showGame board)
     return ()
---ghci> let sampleGameString = "1 1 R;2 2 D;3 3 R\n4 4 P1;5 5 P2\nP1\n3"
-
--- IO action to load a game state from a file
--- readFile: An IO action that reads the content of a file. readGame: Converts the string content from the file into a game state
-
-loadGame :: FilePath -> IO (Maybe Game) 
-loadGame file = do
-  b <- doesFileExist file
-  if b 
-      then do
-        contents <- readFile file
-        return $ readGame contents
-      else return Nothing
-
 
 putBestMove :: Game -> IO ()
 putBestMove game = do
@@ -149,7 +123,6 @@ putBestMove game = do
                            putStrLn $ "Forces Outcome: " ++ show outcome
                     Nothing -> putStrLn "Something went wrong :("
         Nothing -> putStrLn "No move can win or tie, sorry :("
--- :main testGame.txt
--- Main IO action
+
 
 
